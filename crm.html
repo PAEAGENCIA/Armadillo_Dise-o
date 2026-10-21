@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CRM Armadillo">
+<meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>CRM Armadillo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F5F7; --card:#FFFFFF; --card2:#F2F2F7; --text:#1D1D1F; --text2:#6E6E73; --text3:#AEAEB2;
+  --sep:rgba(60,60,67,.13); --fill:rgba(118,118,128,.12); --fill2:rgba(118,118,128,.08);
+  --accent:#1F6F6B; --accent-tint:rgba(31,111,107,.11); --madera:#B5803F; --madera-tint:rgba(181,128,63,.13);
+  --blue:#007AFF; --green:#34C759; --orange:#FF9500; --red:#FF3B30; --purple:#AF52DE; --indigo:#5856D6; --teal:#30B0C7; --gray:#8E8E93;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+  --blur:rgba(249,249,251,.82);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Inter","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --card:#1C1C1E; --card2:#2C2C2E; --text:#F5F5F7; --text2:#98989D; --text3:#636366;
+    --sep:rgba(84,84,88,.55); --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.16);
+    --accent:#3FA39D; --accent-tint:rgba(63,163,157,.18); --madera:#D9A866; --madera-tint:rgba(217,168,102,.16);
+    --blue:#0A84FF; --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --purple:#BF5AF2; --indigo:#5E5CE6; --teal:#40C8E0;
+    --shadow:none; --blur:rgba(22,22,24,.78); color-scheme:dark;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.4;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;background:none;border:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid color-mix(in srgb, var(--accent) 45%, transparent);outline-offset:2px;border-radius:10px}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.oculto{display:none !important}
+
+/* ---------- Login ---------- */
+.login{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-card{width:100%;max-width:360px;text-align:center}
+.login-card .logo{width:84px;height:84px;border-radius:22px;margin:0 auto;display:grid;place-items:center;background:var(--accent);color:#fff;box-shadow:var(--shadow)}
+.login-card .logo svg{width:44px;height:44px}
+.login-card h1{margin-top:22px;font-size:28px;font-weight:700;letter-spacing:-.025em}
+.login-card p{margin-top:6px;color:var(--text2)}
+.login-card form{margin-top:28px;display:grid;gap:12px}
+.campo{width:100%;height:50px;border-radius:12px;border:0;background:var(--card);padding:0 16px;font-size:17px;box-shadow:var(--shadow)}
+.campo:focus{outline:2px solid var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 22px;border-radius:12px;background:var(--accent);color:#fff;font-size:17px;font-weight:600}
+.btn:active{opacity:.85}
+.btn.sec{background:var(--fill);color:var(--accent)}
+.btn.chico{height:36px;padding:0 14px;font-size:15px;border-radius:10px}
+.error{color:var(--red);font-size:14px;min-height:18px}
+
+/* ---------- App shell ---------- */
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.lateral{position:sticky;top:0;height:100vh;padding:22px 14px;border-right:1px solid var(--sep);background:var(--bg);display:flex;flex-direction:column;gap:4px}
+.marca{display:flex;align-items:center;gap:10px;padding:4px 10px 18px}
+.marca .m{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center}
+.marca .m svg{width:20px;height:20px}
+.marca b{display:block;font-size:15px;font-weight:600}
+.marca span{display:block;font-size:12px;color:var(--text2)}
+.nav-item{display:flex;align-items:center;gap:12px;height:38px;padding:0 10px;border-radius:9px;font-size:15px;color:var(--text);text-align:left;width:100%}
+.nav-item svg{color:var(--accent)}
+.nav-item:hover{background:var(--fill2)}
+.nav-item[aria-current="page"]{background:var(--accent);color:#fff}
+.nav-item[aria-current="page"] svg{color:#fff}
+.nav-item .badge{margin-left:auto}
+.lateral .pie{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--sep);display:grid;gap:8px;font-size:12px;color:var(--text2)}
+.lateral .pie button{text-align:left;color:var(--accent);font-size:14px}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--red);color:#fff;font-size:12px;font-weight:600;display:inline-grid;place-items:center}
+.nav-item[aria-current="page"] .badge{background:#fff;color:var(--accent)}
+
+.principal{min-width:0;padding:28px 36px 60px;max-width:1120px;width:100%}
+.encabezado{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+.encabezado h1{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.encabezado p{color:var(--text2);margin-top:4px;font-size:15px}
+.icono-btn{width:36px;height:36px;border-radius:99px;background:var(--fill);color:var(--accent);display:grid;place-items:center;flex:none}
+.icono-btn.girando svg{animation:gira 1s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.demo-aviso{display:flex;gap:10px;align-items:center;background:var(--madera-tint);color:var(--text);border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:18px}
+.demo-aviso b{font-weight:600}
+
+/* Tabs móvil */
+.tabbar{display:none}
+
+/* ---------- Componentes ---------- */
+.grupo-titulo{font-size:13px;color:var(--text2);text-transform:none;margin:26px 4px 8px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.grupo-titulo b{font-size:20px;color:var(--text);font-weight:700;letter-spacing:-.02em}
+.lista{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.fila{display:flex;align-items:center;gap:12px;padding:11px 14px;min-height:60px;width:100%;text-align:left;position:relative}
+.fila + .fila::before{content:"";position:absolute;top:0;left:62px;right:0;height:1px;background:var(--sep)}
+.fila:active,.fila:hover{background:var(--fill2)}
+.avatar{width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:14px;font-weight:600;color:#fff;background:var(--gray)}
+.avatar.Alta{background:linear-gradient(160deg,var(--accent),color-mix(in srgb,var(--accent) 70%,#000))}
+.avatar.Media{background:linear-gradient(160deg,var(--madera),color-mix(in srgb,var(--madera) 70%,#000))}
+.avatar.Baja{background:linear-gradient(160deg,#9A9AA0,#6E6E73)}
+.fila .txt{flex:1;min-width:0;display:block}
+.fila .t1{font-size:16px;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fila .t2{display:block;font-size:13.5px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.fila .der{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.fila .tiempo{font-size:13px;color:var(--text2)}
+.fila .tiempo.tarde{color:var(--red);font-weight:500}
+.fila .chev{color:var(--text3);width:16px;height:16px}
+.pill{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.e-Nuevo{background:color-mix(in srgb,var(--blue) 14%,transparent);color:var(--blue)}
+.pill.e-Contactado{background:color-mix(in srgb,var(--indigo) 14%,transparent);color:var(--indigo)}
+.pill.e-Visita-agendada{background:color-mix(in srgb,var(--orange) 16%,transparent);color:color-mix(in srgb,var(--orange) 80%,var(--text))}
+.pill.e-Visita-realizada{background:color-mix(in srgb,var(--teal) 16%,transparent);color:color-mix(in srgb,var(--teal) 75%,var(--text))}
+.pill.e-Propuesta-enviada{background:color-mix(in srgb,var(--purple) 14%,transparent);color:var(--purple)}
+.pill.e-Ganado{background:color-mix(in srgb,var(--green) 16%,transparent);color:color-mix(in srgb,var(--green) 75%,var(--text))}
+.pill.e-Perdido{background:var(--fill);color:var(--text2)}
+.pill.visita{background:var(--madera-tint);color:var(--madera)}
+.punto{width:7px;height:7px;border-radius:50%;flex:none;display:inline-block}
+.punto.Alta{background:var(--accent)}.punto.Media{background:var(--madera)}.punto.Baja{background:var(--text3)}
+.vacio{padding:34px 20px;text-align:center;color:var(--text2)}
+.vacio svg{width:34px;height:34px;color:var(--text3);margin:0 auto 10px;display:block}
+.vacio b{display:block;color:var(--text);font-weight:600;margin-bottom:2px}
+
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tile{background:var(--card);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);text-align:left}
+.tile .et{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.tile .et svg{width:16px;height:16px;color:var(--accent)}
+.tile .num{font-size:30px;font-weight:700;letter-spacing:-.03em;margin-top:6px;line-height:1.05}
+.tile .sub{font-size:12.5px;color:var(--text2);margin-top:4px}
+.tiles.seis{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.segmentado{display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
+.segmentado button{height:30px;padding:0 14px;border-radius:7px;font-size:13.5px;font-weight:500;color:var(--text)}
+.segmentado button[aria-pressed="true"]{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
+
+.buscador{position:relative;margin-bottom:12px}
+.buscador svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--text2)}
+.buscador input{width:100%;height:38px;border-radius:10px;border:0;background:var(--fill);padding:0 12px 0 34px;font-size:16px}
+.buscador input::placeholder{color:var(--text2)}
+.buscador input:focus{outline:2px solid var(--accent)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin-bottom:14px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:32px;padding:0 14px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.chip .n{color:var(--text2);font-weight:500}
+.chip[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.chip[aria-pressed="true"] .n{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.conteo{font-size:13px;color:var(--text2);margin:0 4px 8px}
+
+.tarjeta{background:var(--card);border-radius:16px;padding:18px 18px 16px;box-shadow:var(--shadow)}
+.tarjeta h2{font-size:17px;font-weight:600;letter-spacing:-.015em}
+.tarjeta .ayuda{font-size:13px;color:var(--text2);margin-top:3px}
+.rejilla{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.rejilla .ancho{grid-column:1 / -1}
+.barra-fila{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) 54px 46px;gap:10px;align-items:center;padding:8px 0;font-size:14px}
+.barra-fila + .barra-fila{border-top:1px solid var(--sep)}
+.barra-fila .nom{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barra-fila .nom small{display:block;font-size:12px;color:var(--text2)}
+.barra{height:10px;border-radius:99px;background:var(--fill2);overflow:hidden}
+.barra i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.barra-fila .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.barra-fila .p{text-align:right;font-variant-numeric:tabular-nums;color:var(--text2);font-size:13px}
+.barra-fila.alerta .barra i{background:var(--orange)}
+.etiqueta-alerta{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 12px;border-radius:10px;background:color-mix(in srgb,var(--orange) 13%,transparent);color:var(--text);font-size:13.5px}
+.etiqueta-alerta b{font-weight:600}
+.tabla{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.tabla th{font-size:12px;color:var(--text2);font-weight:500;text-align:right;padding:6px 4px;border-bottom:1px solid var(--sep)}
+.tabla th:first-child,.tabla td:first-child{text-align:left}
+.tabla td{padding:10px 4px;text-align:right;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--sep)}
+.tabla tr:last-child td{border-bottom:0}
+.tabla td:first-child{max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.desglose{display:grid;gap:2px;margin-top:8px}
+.desglose .barra-fila{grid-template-columns:minmax(0,1.4fr) minmax(0,1.6fr) 34px}
+.pipe{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px}
+.pipe::-webkit-scrollbar{display:none}
+.pipe button{flex:none;min-width:112px;background:var(--card);border-radius:12px;padding:10px 12px;text-align:left;box-shadow:var(--shadow)}
+.pipe button b{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.pipe button span{font-size:12.5px;color:var(--text2)}
+.pipe button[aria-pressed="true"]{outline:2px solid var(--accent)}
+
+/* ---------- Ficha (sheet) ---------- */
+.velo{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
+.velo.abierto{opacity:1;pointer-events:auto}
+.ficha[hidden]{display:none}
+.ficha{position:fixed;z-index:60;background:var(--bg);display:flex;flex-direction:column;transition:transform .32s cubic-bezier(.32,.72,0,1)}
+@media (min-width:901px){
+  .ficha{top:12px;right:12px;bottom:12px;width:440px;border-radius:18px;transform:translateX(calc(100% + 24px));box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  .ficha.abierta{transform:none}
+}
+.ficha-cab{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
+.ficha-cab .grab{display:none}
+.ficha-cab button{color:var(--accent);font-size:17px;font-weight:600}
+.ficha-cuerpo{overflow-y:auto;padding:4px 16px 40px;flex:1;-webkit-overflow-scrolling:touch}
+.persona{text-align:center;padding:6px 0 4px}
+.persona .avatar{width:76px;height:76px;font-size:28px;margin:0 auto}
+.persona h2{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:10px}
+.persona p{color:var(--text2);font-size:14px;margin-top:2px}
+.persona .pills{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:10px}
+.acciones{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.accion{background:var(--card);border-radius:12px;padding:10px 6px 9px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--accent);box-shadow:var(--shadow)}
+.accion svg{width:22px;height:22px}
+.seccion-t{font-size:13px;color:var(--text2);margin:22px 4px 7px;text-transform:uppercase;letter-spacing:.02em}
+.caja{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.dato{display:flex;justify-content:space-between;gap:16px;padding:11px 14px;font-size:15px;position:relative}
+.dato + .dato::before{content:"";position:absolute;top:0;left:14px;right:0;height:1px;background:var(--sep)}
+.dato span{color:var(--text2);flex:none}
+.dato b{font-weight:500;text-align:right}
+.etapas{display:flex;gap:6px;flex-wrap:wrap;padding:12px}
+.etapas button{height:32px;padding:0 12px;border-radius:99px;background:var(--fill2);font-size:13.5px;font-weight:500}
+.etapas button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.visita-caja{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.cal{width:48px;height:50px;border-radius:10px;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none;overflow:hidden}
+.cal small{font-size:10.5px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.04em}
+.cal b{font-size:21px;font-weight:600;line-height:1}
+.visita-caja .txt{flex:1}
+.visita-caja .txt b{display:block;font-weight:600}
+.visita-caja .txt span{font-size:13.5px;color:var(--text2)}
+.linea-form{display:flex;gap:8px;align-items:center;padding:10px 12px}
+.linea-form input,.linea-form textarea{flex:1;min-width:0;border:0;background:var(--fill2);border-radius:9px;padding:9px 11px;font-size:16px}
+.linea-form textarea{min-height:64px;resize:vertical}
+.linea-form input:focus,.linea-form textarea:focus{outline:2px solid var(--accent)}
+.rapidos{display:flex;gap:6px;padding:0 12px 12px;flex-wrap:wrap}
+.rapidos button{height:30px;padding:0 11px;border-radius:99px;background:var(--fill2);font-size:13px;color:var(--accent);font-weight:500}
+.notas{padding:4px 14px 10px}
+.notas p{font-size:14px;padding:8px 0;border-top:1px solid var(--sep);white-space:pre-wrap}
+.notas p:first-child{border-top:0}
+.notas p small{display:block;color:var(--text2);font-size:12px}
+details.hist summary{list-style:none;cursor:pointer;color:var(--accent);font-size:14px;padding:12px 14px}
+details.hist summary::-webkit-details-marker{display:none}
+details.hist .notas p{font-size:13px;color:var(--text2)}
+
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:rgba(30,30,32,.92);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:80;max-width:calc(100% - 32px);text-align:center}
+.toast.ver{opacity:1;transform:translate(-50%,0)}
+.cargando{padding:60px 0;text-align:center;color:var(--text2)}
+.esqueleto{height:60px;border-radius:14px;background:var(--fill2);margin-bottom:10px;animation:late 1.2s ease-in-out infinite}
+@keyframes late{50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.ficha,.velo,.toast{transition:none}.esqueleto,.icono-btn.girando svg{animation:none}}
+
+/* ---------- Móvil ---------- */
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .lateral{display:none}
+  .principal{padding:calc(14px + env(safe-area-inset-top)) 16px calc(100px + env(safe-area-inset-bottom))}
+  .encabezado{margin-bottom:16px}
+  .encabezado h1{font-size:32px}
+  .tabbar{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:var(--blur);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep)}
+  .tabbar button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:500;color:var(--text2);padding:4px 0;position:relative}
+  .tabbar button svg{width:25px;height:25px}
+  .tabbar button[aria-current="page"]{color:var(--accent)}
+  .tabbar .badge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;font-size:11px}
+  .tiles,.tiles.seis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiles .tile.ocultable{display:none}
+  .rejilla{grid-template-columns:1fr}
+  .barra-fila{grid-template-columns:minmax(0,1fr) 44px 40px;grid-template-areas:"nom nom nom" "barra v p";gap:4px 10px;padding:9px 0}
+  .barra-fila .nom{grid-area:nom;white-space:normal}
+  .barra-fila .barra{grid-area:barra}
+  .barra-fila .v{grid-area:v}
+  .barra-fila .p{grid-area:p}
+  .desglose .barra-fila{grid-template-columns:minmax(0,1fr) 34px;grid-template-areas:"nom nom" "barra v"}
+  .grupo-titulo{flex-direction:column;align-items:flex-start;gap:2px}
+  .fila .t1 .pill{display:none}
+  .ficha{left:0;right:0;bottom:0;top:calc(10px + env(safe-area-inset-top));border-radius:14px 14px 0 0;transform:translateY(105%);box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+  .ficha.abierta{transform:none}
+  .ficha-cab{padding-top:8px}
+  .ficha-cab .grab{display:block;position:absolute;left:50%;top:6px;transform:translateX(-50%);width:36px;height:5px;border-radius:99px;background:var(--text3)}
+  .tabla td:first-child{max-width:130px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<section class="login" id="login">
+  <div class="login-card">
+    <div class="logo"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M8 34c0-11 7.2-20 16-20s16 9 16 20"/><path d="M14 34c0-7.7 4.5-14 10-14s10 6.3 10 14"/><path d="M20 34c0-4.4 1.8-8 4-8s4 3.6 4 8"/><path d="M5 34h38"/></svg></div>
+    <h1>CRM Armadillo</h1>
+    <p>Leads y métricas de la landing de cocinas</p>
+    <form id="form-login" autocomplete="off">
+      <input class="campo" id="clave" type="password" placeholder="Clave de acceso" aria-label="Clave de acceso" autocomplete="current-password">
+      <button class="btn" type="submit" id="btn-entrar">Entrar</button>
+      <p class="error" id="error-login" role="alert"></p>
+    </form>
+  </div>
+</section>
+
+<!-- ===================== APP ===================== -->
+<div class="app oculto" id="app">
+  <aside class="lateral" aria-label="Navegación">
+    <div class="marca">
+      <span class="m"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M8 34c0-11 7.2-20 16-20s16 9 16 20"/><path d="M15 34c0-7.2 4-13 9-13s9 5.8 9 13"/><path d="M5 34h38"/></svg></span>
+      <div><b>Armadillo</b><span>CRM de cocinas</span></div>
+    </div>
+    <button class="nav-item" data-ir="hoy"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Hoy<span class="badge oculto" data-badge></span></button>
+    <button class="nav-item" data-ir="leads"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20c0-3-2-5.6-4.8-6.3"/></svg>Leads</button>
+    <button class="nav-item" data-ir="metricas"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Métricas</button>
+    <div class="pie">
+      <span id="sync-lat">Sin sincronizar</span>
+      <button type="button" data-accion="actualizar">Actualizar datos</button>
+      <button type="button" data-accion="salir">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="principal" id="principal" aria-live="polite"></main>
+
+  <nav class="tabbar" aria-label="Navegación">
+    <button data-ir="hoy"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Hoy<span class="badge oculto" data-badge></span></button>
+    <button data-ir="leads"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20c0-3-2-5.6-4.8-6.3"/></svg>Leads</button>
+    <button data-ir="metricas"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Métricas</button>
+  </nav>
+</div>
+
+<div class="velo" id="velo"></div>
+<section class="ficha" id="ficha" role="dialog" aria-modal="true" aria-labelledby="ficha-nombre" hidden>
+  <div class="ficha-cab"><span class="grab" aria-hidden="true"></span><span></span><button type="button" id="cerrar-ficha">Listo</button></div>
+  <div class="ficha-cuerpo" id="ficha-cuerpo"></div>
+</section>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ============ CONFIGURACIÓN ============ */
+const API = "https://script.google.com/macros/s/AKfycbxaxYx2Esw2nu3v2PPYmvPWl3ipeXG1lczlPagHxst3H0MCP9V8NTSFjdcW4AZm1ksF/exec";
+const WHATSAPP_DANIEL = "522221367108";
+const ETAPAS = ["Nuevo", "Contactado", "Visita agendada", "Visita realizada", "Propuesta enviada", "Ganado", "Perdido"];
+const PREGUNTAS = ["Etapa", "Uso", "Distribución", "Muro", "Acabados", "Inversión", "Tiempo", "Zona"];
+/* ======================================= */
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const DEMO = new URLSearchParams(location.search).has("demo");
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const I = {
+  chev:'<svg class="i chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
+  wa:'<svg class="i" viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c.3 2.2 2.3 4.2 4.5 4.5l1-1.2 2 .8c-.2 1.1-1 1.9-2.1 1.9-3.6 0-7-3.4-7-7 0-1.1.8-1.9 1.9-2.1l.8 2z"/></svg>',
+  tel:'<svg class="i" viewBox="0 0 24 24"><path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5L16 14l4 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+  enviar:'<svg class="i" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg>',
+  ref:'<svg class="i" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6L20 8.7M20 3.5v5.2h-5.2"/></svg>',
+  lupa:'<svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+  ok:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg>',
+  cal:'<svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  ojo:'<svg class="i" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  persona:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>',
+  inicio:'<svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  pesos:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3v18M16.5 7.5c0-1.9-2-3-4.5-3s-4.5 1.2-4.5 3.2c0 4.6 9 2.6 9 7.4 0 2-2 3.4-4.5 3.4s-4.5-1.3-4.5-3.3"/></svg>',
+  pct:'<svg class="i" viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>'
+};
+
+let clave = store.get("ad_crm_clave") || "";
+let datos = { leads: [], sesiones: [] };
+let vista = store.get("ad_crm_vista") || "hoy";
+let periodo = store.get("ad_crm_periodo") || "7";
+let filtro = "todos", busqueda = "", etapaFiltro = "";
+let fichaFolio = null, ultimaSync = 0, cargando = false;
+
+/* ---------- Utilidades de fecha y formato ---------- */
+const DIA = 864e5;
+function aFecha(v){
+  if(v === "" || v == null) return null;
+  if(typeof v === "number") return new Date(v);
+  const s = String(v);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)){ const [a,m,d] = s.split("-").map(Number); return new Date(a, m - 1, d); }
+  const d = new Date(s); return isNaN(d) ? null : d;
+}
+function hoyInicio(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+function isoDia(d){ return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function hace(ms){
+  if(!ms) return "";
+  const s = (Date.now() - ms) / 1000;
+  if(s < 60) return "ahora";
+  if(s < 3600) return `hace ${Math.floor(s/60)} min`;
+  if(s < 86400) return `hace ${Math.floor(s/3600)} h`;
+  if(s < 172800) return "ayer";
+  if(s < 7 * 86400) return `hace ${Math.floor(s/86400)} días`;
+  return new Date(ms).toLocaleDateString("es-MX", { day:"numeric", month:"short" });
+}
+const fmtNum = n => Number(n || 0).toLocaleString("es-MX");
+const fmtPesos = n => "$" + Math.round(Number(n || 0)).toLocaleString("es-MX");
+const fmtCorto = n => n >= 1e6 ? "$" + (n/1e6).toFixed(1).replace(".0","") + " M" : n >= 1e3 ? "$" + Math.round(n/1e3) + " mil" : fmtPesos(n);
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const iniciales = n => String(n || "?").trim().split(/\s+/).slice(0,2).map(p => p[0]).join("").toUpperCase();
+const claseEtapa = e => "e-" + String(e || "Nuevo").replace(/\s+/g, "-");
+const primerNombre = n => String(n || "").trim().split(/\s+/)[0] || "";
+
+/* ---------- Normalización de datos ---------- */
+function normLead(l){
+  const tel = String(l["WhatsApp"] ?? "").replace(/\D/g, "").replace(/^52(?=\d{10}$)/, "");
+  const rango = String(l["Rango estimado (interno)"] || "").split("-").map(Number).filter(Boolean);
+  return {
+    fecha: aFecha(l["Fecha"])?.getTime() || 0, folio: String(l["Folio"] || ""), estado: l["Estado"] || "",
+    prioridad: l["Prioridad"] || "Baja", nombre: l["Nombre"] || "Sin nombre", tel,
+    etapa: l["Etapa"] || "", uso: l["Uso"] || "", forma: l["Distribución"] || "", tamano: l["Muro principal"] || "",
+    acabado: l["Acabados"] || "", inversion: l["Inversión"] || "", tiempo: l["Tiempo"] || "", zona: l["Zona"] || "",
+    visitaDia: l["Visita día"] || "", visitaHora: l["Visita horario"] || "", visitaFecha: aFecha(l["Visita fecha"]),
+    escribio: l["Escribió por WhatsApp"] === "Sí", rango, rangoMedio: rango.length === 2 ? (rango[0] + rango[1]) / 2 : 0,
+    campana: l["Campaña"] || "", anuncio: l["Anuncio"] || "", monto: Number(l["Monto cerrado"]) || 0,
+    notas: String(l["Notas"] || ""), historial: String(l["Historial"] || ""),
+    seguimiento: ETAPAS.includes(l["Seguimiento"]) ? l["Seguimiento"] : "Nuevo",
+    ultimoContacto: aFecha(l["Último contacto"])?.getTime() || 0, proximo: aFecha(l["Próximo contacto"]),
+    dispositivo: l["Dispositivo"] || ""
+  };
+}
+function normSesion(s){
+  return {
+    inicio: aFecha(s["Inicio"])?.getTime() || 0, paso: Number(s["Paso máximo"]) || 0,
+    form: s["Llegó al formulario"] === "Sí", datos: s["Dejó datos"] === "Sí", visita: s["Apartó visita"] === "Sí",
+    wa: s["Abrió WhatsApp"] === "Sí", anuncio: s["Anuncio"] || "", campana: s["Campaña"] || "", dispositivo: s["Dispositivo"] || ""
+  };
+}
+const apartoVisita = l => l.estado === "Visita apartada";
+const activo = l => l.seguimiento !== "Ganado" && l.seguimiento !== "Perdido";
+const porAtender = l => l.seguimiento === "Nuevo" && !l.ultimoContacto;
+
+/* ---------- API ---------- */
+async function api(params){
+  if(DEMO) return demoApi(params);
+  const url = API + "?" + new URLSearchParams(Object.assign({ clave }, params)).toString();
+  const r = await fetch(url, { cache: "no-store" });
+  if(!r.ok) throw new Error("red");
+  return r.json();
+}
+async function sincronizar(manual){
+  if(cargando) return;
+  cargando = true; girar(true);
+  try{
+    const r = await api({ accion: "datos" });
+    if(!r.ok){ if(r.error === "clave"){ salir("La clave no es correcta."); return; } throw new Error(r.error); }
+    datos.leads = r.leads.map(normLead).sort((a,b) => b.fecha - a.fecha);
+    datos.sesiones = r.sesiones.map(normSesion);
+    ultimaSync = Date.now();
+    render();
+    if(manual) toast("Datos actualizados");
+  }catch(e){
+    toast("No pudimos conectar con el CRM. Revisa tu conexión e inténtalo de nuevo.");
+    if(!ultimaSync) $("principal").innerHTML = `<div class="vacio">${I.ref}<b>Sin conexión</b>No pudimos cargar los datos.<br><br><button class="btn chico" data-accion="actualizar">Reintentar</button></div>`;
+  }finally{ cargando = false; girar(false); actualizarSync(); }
+}
+async function guardar(folio, cambios, exito){
+  const l = datos.leads.find(x => x.folio === folio); if(!l) return;
+  const antes = Object.assign({}, l);
+  aplicarLocal(l, cambios); render(); pintarFicha();
+  try{
+    const r = await api({ accion: "guardar", folio, cambios: JSON.stringify(cambios) });
+    if(!r.ok) throw new Error(r.error);
+    Object.assign(l, normLead(r.lead)); render(); pintarFicha();
+    if(exito) toast(exito);
+  }catch(e){
+    Object.assign(l, antes); render(); pintarFicha();
+    toast("No se guardó. Revisa tu conexión e inténtalo de nuevo.");
+  }
+}
+function aplicarLocal(l, c){
+  const sello = new Date().toLocaleString("es-MX", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+  if(c.seguimiento) l.seguimiento = c.seguimiento;
+  if(c.contacto) l.ultimoContacto = Date.now();
+  if(c.proximo !== undefined) l.proximo = aFecha(c.proximo);
+  if(c.monto !== undefined) l.monto = Number(c.monto) || 0;
+  if(c.nota) l.notas = (l.notas ? l.notas + "\n" : "") + sello + " · " + c.nota;
+}
+
+/* ---------- Navegación ---------- */
+function ir(v){ vista = v; store.set("ad_crm_vista", v); render(); window.scrollTo(0,0); }
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-ir],[data-accion],[data-lead],[data-filtro],[data-periodo],[data-etapa-filtro]");
+  if(!b) return;
+  if(b.dataset.ir) ir(b.dataset.ir);
+  else if(b.dataset.lead) abrirFicha(b.dataset.lead);
+  else if(b.dataset.filtro){ filtro = b.dataset.filtro; etapaFiltro = ""; render(); }
+  else if(b.dataset.etapaFiltro !== undefined){ etapaFiltro = etapaFiltro === b.dataset.etapaFiltro ? "" : b.dataset.etapaFiltro; filtro = "todos"; render(); }
+  else if(b.dataset.periodo){ periodo = b.dataset.periodo; store.set("ad_crm_periodo", periodo); render(); }
+  else if(b.dataset.accion === "actualizar") sincronizar(true);
+  else if(b.dataset.accion === "salir") salir();
+});
+
+function render(){
+  document.querySelectorAll("[data-ir]").forEach(b => b.setAttribute("aria-current", b.dataset.ir === vista ? "page" : "false"));
+  const n = pendientes().total;
+  document.querySelectorAll("[data-badge]").forEach(b => { b.textContent = n; b.classList.toggle("oculto", !n); });
+  const html = vista === "leads" ? vistaLeads() : vista === "metricas" ? vistaMetricas() : vistaHoy();
+  const p = $("principal");
+  const enfocado = document.activeElement && document.activeElement.id === "buscar";
+  const pos = enfocado ? document.activeElement.selectionStart : 0;
+  p.innerHTML = (DEMO ? `<div class="demo-aviso">${I.ojo}<span><b>Datos de ejemplo.</b> Así se verá el CRM con leads reales.</span></div>` : "") + html;
+  if(enfocado){ const i = $("buscar"); if(i){ i.focus(); i.setSelectionRange(pos, pos); } }
+  const ib = $("buscar"); if(ib) ib.oninput = () => { busqueda = ib.value; render(); };
+}
+
+function encabezado(titulo, sub){
+  return `<header class="encabezado"><div><h1>${titulo}</h1>${sub ? `<p>${sub}</p>` : ""}</div>
+    <button class="icono-btn" data-accion="actualizar" aria-label="Actualizar datos" id="btn-ref">${I.ref}</button></header>`;
+}
+function girar(si){ document.querySelectorAll("#btn-ref").forEach(b => b.classList.toggle("girando", si)); }
+function actualizarSync(){ $("sync-lat").textContent = ultimaSync ? "Actualizado " + hace(ultimaSync) : "Sin sincronizar"; }
+
+/* ---------- Filas ---------- */
+function filaLead(l, extra){
+  const sub = extra || [l.zona, rangoTxt(l.inversion), l.tiempo].filter(Boolean).join(" · ");
+  const tarde = porAtender(l) && Date.now() - l.fecha > DIA;
+  return `<button class="fila" data-lead="${esc(l.folio)}">
+    <span class="avatar ${esc(l.prioridad)}">${esc(iniciales(l.nombre))}</span>
+    <span class="txt"><span class="t1">${esc(l.nombre)}${apartoVisita(l) ? ` <span class="pill visita">Apartó visita</span>` : ""}</span><span class="t2">${esc(sub)}</span></span>
+    <span class="der"><span class="pill ${claseEtapa(l.seguimiento)}">${esc(l.seguimiento)}</span><span class="tiempo ${tarde ? "tarde" : ""}">${hace(l.fecha)}</span></span>
+    ${I.chev}</button>`;
+}
+function rangoTxt(inv){
+  return String(inv || "").replace(/\$(\d{3}),000/g, "$$$1k").replace(" a ", "–").replace("Más de ", "+").replace("Menos de ", "<");
+}
+function vacio(titulo, texto){ return `<div class="vacio">${I.ok}<b>${titulo}</b>${texto}</div>`; }
+
+/* ---------- Vista: Hoy ---------- */
+function pendientes(){
+  const hoy = hoyInicio().getTime(), manana = hoy + DIA;
+  const ls = datos.leads;
+  const confirmar = ls.filter(l => apartoVisita(l) && l.seguimiento === "Nuevo");
+  const nuevos = ls.filter(l => porAtender(l) && !confirmar.includes(l)).sort((a,b) => a.fecha - b.fecha);
+  const seguimientos = ls.filter(l => activo(l) && l.proximo && l.proximo.getTime() < manana && !confirmar.includes(l) && !nuevos.includes(l)).sort((a,b) => a.proximo - b.proximo);
+  const proximas = ls.filter(l => l.seguimiento === "Visita agendada" && l.visitaFecha && l.visitaFecha.getTime() >= hoy).sort((a,b) => a.visitaFecha - b.visitaFecha);
+  return { confirmar, nuevos, seguimientos, proximas, total: confirmar.length + nuevos.length + seguimientos.length };
+}
+function vistaHoy(){
+  const p = pendientes();
+  const hoy = hoyInicio().getTime();
+  const fecha = new Date().toLocaleDateString("es-MX", { weekday:"long", day:"numeric", month:"long" });
+  const leadsHoy = datos.leads.filter(l => l.fecha >= hoy).length;
+  const visitasHoy = datos.sesiones.filter(s => s.inicio >= hoy).length;
+  const semana = datos.leads.filter(l => l.visitaFecha && l.visitaFecha.getTime() >= hoy && l.visitaFecha.getTime() < hoy + 7*DIA && activo(l)).length;
+  let h = encabezado("Hoy", fecha.charAt(0).toUpperCase() + fecha.slice(1));
+  h += `<div class="tiles">
+    <div class="tile"><div class="et">${I.persona}Por atender</div><div class="num">${p.total}</div><div class="sub">${p.confirmar.length} visitas por confirmar</div></div>
+    <div class="tile"><div class="et">${I.inicio}Leads hoy</div><div class="num">${leadsHoy}</div><div class="sub">${fmtNum(visitasHoy)} visitas a la página</div></div>
+    <div class="tile ocultable"><div class="et">${I.cal}Visitas esta semana</div><div class="num">${semana}</div><div class="sub">en los próximos 7 días</div></div>
+  </div>`;
+  const bloque = (titulo, ayuda, arr, extra) => arr.length ? `<div class="grupo-titulo"><b>${titulo}</b><span>${ayuda}</span></div><div class="lista">${arr.map(l => filaLead(l, extra && extra(l))).join("")}</div>` : "";
+  if(!p.total && !p.proximas.length){
+    h += `<div class="grupo-titulo"><b>Pendientes</b></div><div class="lista">${vacio("Todo al día", "No hay leads por atender. Los nuevos aparecen aquí en cuanto llegan.")}</div>`;
+  }
+  h += bloque("Visitas por confirmar", "Escríbeles para confirmar la dirección", p.confirmar, l => `${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""} · ${l.zona}`);
+  h += bloque("Nuevos sin contactar", "Los más antiguos primero", p.nuevos);
+  h += bloque("Seguimientos para hoy", "Fecha de próximo contacto vencida o de hoy", p.seguimientos, l => `Contactar: ${l.proximo.toLocaleDateString("es-MX",{day:"numeric",month:"short"})} · ${l.zona}`);
+  h += bloque("Próximas visitas", "Visitas técnicas confirmadas", p.proximas, l => `${l.visitaFecha.toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short"})}${l.visitaHora ? " · " + l.visitaHora : ""}`);
+  return h;
+}
+
+/* ---------- Vista: Leads ---------- */
+const FILTROS = [
+  ["todos", "Todos", () => true],
+  ["atender", "Por atender", porAtender],
+  ["visita", "Apartó visita", apartoVisita],
+  ["alta", "Prioridad alta", l => l.prioridad === "Alta"],
+  ["proceso", "En proceso", l => ["Contactado","Visita agendada","Visita realizada","Propuesta enviada"].includes(l.seguimiento)],
+  ["ganados", "Ganados", l => l.seguimiento === "Ganado"],
+  ["perdidos", "Perdidos", l => l.seguimiento === "Perdido"]
+];
+function vistaLeads(){
+  const q = busqueda.trim().toLowerCase();
+  const f = (FILTROS.find(x => x[0] === filtro) || FILTROS[0])[2];
+  const lista = datos.leads.filter(l => f(l) && (!etapaFiltro || l.seguimiento === etapaFiltro) &&
+    (!q || [l.nombre, l.tel, l.zona, l.folio, l.forma, l.anuncio].join(" ").toLowerCase().includes(q)));
+  let h = encabezado("Leads", `${fmtNum(datos.leads.length)} en total`);
+  h += `<div class="pipe" aria-label="Embudo de seguimiento">${ETAPAS.map(e => {
+    const n = datos.leads.filter(l => l.seguimiento === e).length;
+    return `<button data-etapa-filtro="${e}" aria-pressed="${etapaFiltro === e}"><b>${n}</b><span>${e}</span></button>`;
+  }).join("")}</div>`;
+  h += `<div class="buscador">${I.lupa}<input id="buscar" type="search" placeholder="Buscar por nombre, teléfono, zona o folio" value="${esc(busqueda)}" aria-label="Buscar leads"></div>`;
+  h += `<div class="chips" role="group" aria-label="Filtros">${FILTROS.map(([k, t, fn]) =>
+    `<button class="chip" data-filtro="${k}" aria-pressed="${filtro === k && !etapaFiltro}">${t}<span class="n">${datos.leads.filter(fn).length}</span></button>`).join("")}</div>`;
+  h += `<p class="conteo">${lista.length === 1 ? "1 lead" : fmtNum(lista.length) + " leads"}${etapaFiltro ? " en " + etapaFiltro : ""}</p>`;
+  h += lista.length ? `<div class="lista">${lista.map(l => filaLead(l)).join("")}</div>`
+    : `<div class="lista">${datos.leads.length ? vacio("Sin resultados", "Prueba con otro filtro o búsqueda.") : vacio("Aún no hay leads", "Cuando alguien termine el diagnóstico, aparece aquí.")}</div>`;
+  return h;
+}
+
+/* ---------- Vista: Métricas ---------- */
+function enPeriodo(ms){
+  if(periodo === "todo") return true;
+  const desde = periodo === "hoy" ? hoyInicio().getTime() : hoyInicio().getTime() - (Number(periodo) - 1) * DIA;
+  return ms >= desde;
+}
+function vistaMetricas(){
+  const ses = datos.sesiones.filter(s => enPeriodo(s.inicio));
+  const leads = datos.leads.filter(l => enPeriodo(l.fecha));
+  const visitas = ses.length;
+  const iniciaron = ses.filter(s => s.paso >= 2).length;
+  const nLeads = leads.length;
+  const apartadas = leads.filter(apartoVisita).length;
+  const ganados = leads.filter(l => l.seguimiento === "Ganado");
+  const vendido = ganados.reduce((a, l) => a + l.monto, 0);
+
+  let h = encabezado("Métricas", "Landing de cocinas integrales");
+  h += `<div class="segmentado" role="group" aria-label="Periodo" style="margin-bottom:16px">${[["hoy","Hoy"],["7","7 días"],["30","30 días"],["todo","Todo"]].map(([k,t]) =>
+    `<button data-periodo="${k}" aria-pressed="${periodo === k}">${t}</button>`).join("")}</div>`;
+  h += `<div class="tiles seis">
+    <div class="tile"><div class="et">${I.ojo}Visitas</div><div class="num">${fmtNum(visitas)}</div><div class="sub">personas que entraron</div></div>
+    <div class="tile"><div class="et">${I.inicio}Iniciaron</div><div class="num">${fmtNum(iniciaron)}</div><div class="sub">${pct(iniciaron, visitas)}% contestó al menos una</div></div>
+    <div class="tile"><div class="et">${I.persona}Leads</div><div class="num">${fmtNum(nLeads)}</div><div class="sub">${pct(nLeads, visitas)}% de las visitas</div></div>
+    <div class="tile"><div class="et">${I.cal}Visitas apartadas</div><div class="num">${fmtNum(apartadas)}</div><div class="sub">${pct(apartadas, nLeads)}% de los leads</div></div>
+    <div class="tile"><div class="et">${I.pct}Cierre</div><div class="num">${pct(ganados.length, nLeads)}%</div><div class="sub">${ganados.length} ${ganados.length === 1 ? "venta" : "ventas"} de ${nLeads} leads</div></div>
+    <div class="tile"><div class="et">${I.pesos}Vendido</div><div class="num">${fmtCorto(vendido)}</div><div class="sub">monto cerrado registrado</div></div>
+  </div>`;
+
+  // Embudo del diagnóstico
+  const pasos = [["Entraron a la página", "", visitas]];
+  PREGUNTAS.forEach((q, i) => pasos.push([`Contestó ${i + 1}. ${q}`, "", ses.filter(s => s.paso >= i + 2).length]));
+  pasos.push(["Dejó sus datos", "nombre y WhatsApp", ses.filter(s => s.datos || s.paso >= 10).length]);
+  pasos.push(["Apartó su visita", "", ses.filter(s => s.visita).length]);
+  let peor = -1, peorCaida = 0;
+  for(let i = 1; i < pasos.length - 1; i++){ const c = pasos[i - 1][2] - pasos[i][2]; if(c > peorCaida){ peorCaida = c; peor = i; } }
+  h += `<div class="rejilla"><div class="tarjeta ancho"><h2>¿En qué parte se quedan?</h2><p class="ayuda">De cada 100 personas que entran, cuántas llegan a cada paso del diagnóstico.</p>`;
+  if(!visitas) h += vacio("Sin visitas en este periodo", "Cambia el periodo o espera a que lleguen visitas.");
+  else {
+    h += pasos.map(([n, s, v], i) => `<div class="barra-fila ${i === peor ? "alerta" : ""}"><span class="nom">${esc(n)}${s ? `<small>${s}</small>` : ""}</span><span class="barra"><i style="width:${pct(v, visitas)}%"></i></span><span class="v">${fmtNum(v)}</span><span class="p">${pct(v, visitas)}%</span></div>`).join("");
+    if(peor > 0) h += `<p class="etiqueta-alerta">Aquí se va más gente: <b>${pct(peorCaida, pasos[peor - 1][2])}%</b> no pasa de “${esc(pasos[peor][0].replace("Contestó ", ""))}”.</p>`;
+  }
+  h += `</div>`;
+
+  // Por anuncio
+  const grupos = {};
+  ses.forEach(s => { const k = s.anuncio || "Sin anuncio (directo u orgánico)"; (grupos[k] = grupos[k] || { v:0, l:0, a:0 }).v++; if(s.datos) grupos[k].l++; if(s.visita) grupos[k].a++; });
+  const filasAn = Object.entries(grupos).sort((a, b) => b[1].l - a[1].l || b[1].v - a[1].v);
+  h += `<div class="tarjeta ancho"><h2>Por anuncio</h2><p class="ayuda">Qué anuncio trae más leads. Sale del parámetro utm_content de cada anuncio en Meta.</p>`;
+  h += filasAn.length ? `<table class="tabla"><thead><tr><th>Anuncio</th><th>Visitas</th><th>Leads</th><th>Conv.</th><th>Visitas ap.</th></tr></thead><tbody>${filasAn.map(([k, g]) =>
+    `<tr><td title="${esc(k)}">${esc(k)}</td><td>${fmtNum(g.v)}</td><td>${fmtNum(g.l)}</td><td>${pct(g.l, g.v)}%</td><td>${fmtNum(g.a)}</td></tr>`).join("")}</tbody></table>`
+    : vacio("Sin datos", "Aún no hay visitas en este periodo.");
+  h += `</div>`;
+
+  // Desgloses de leads
+  const desglose = (titulo, campo, orden) => {
+    const c = {}; leads.forEach(l => { const k = l[campo] || "Sin dato"; c[k] = (c[k] || 0) + 1; });
+    let arr = Object.entries(c);
+    arr = orden ? arr.sort((a, b) => orden.indexOf(a[0]) - orden.indexOf(b[0])) : arr.sort((a, b) => b[1] - a[1]);
+    const max = Math.max(1, ...arr.map(x => x[1]));
+    return `<div class="tarjeta"><h2>${titulo}</h2>${arr.length ? `<div class="desglose">${arr.map(([k, v]) =>
+      `<div class="barra-fila"><span class="nom">${esc(k)}</span><span class="barra"><i style="width:${v / max * 100}%"></i></span><span class="v">${v}</span></div>`).join("")}</div>` : `<p class="ayuda">Sin leads en este periodo.</p>`}</div>`;
+  };
+  h += desglose("Inversión contemplada", "inversion", ["Menos de $150,000","$150,000 a $250,000","$250,000 a $400,000","Más de $400,000","Prefiero que me orienten","Sin dato"]);
+  h += desglose("Tiempo de compra", "tiempo", ["Lo antes posible","En 1 a 3 meses","En 3 a 6 meses","Todavía sin fecha","Sin dato"]);
+  h += desglose("Zona", "zona");
+  h += desglose("Prioridad", "prioridad", ["Alta","Media","Baja","Sin dato"]);
+  h += desglose("Distribución", "forma");
+  h += desglose("Acabados", "acabado");
+
+  // Embudo de ventas
+  const act = datos.leads.filter(activo);
+  const valor = act.reduce((a, l) => a + l.rangoMedio, 0);
+  const maxE = Math.max(1, ...ETAPAS.map(e => datos.leads.filter(l => l.seguimiento === e).length));
+  h += `<div class="tarjeta ancho"><h2>Seguimiento de ventas</h2><p class="ayuda">Todos los leads según su etapa. Valor estimado en proceso: <b>${fmtCorto(valor)}</b> (punto medio del rango interno de ${act.length} leads activos).</p>
+    <div class="desglose">${ETAPAS.map(e => { const n = datos.leads.filter(l => l.seguimiento === e).length;
+      return `<div class="barra-fila"><span class="nom">${e}</span><span class="barra"><i style="width:${n / maxE * 100}%"></i></span><span class="v">${n}</span></div>`; }).join("")}</div></div>`;
+
+  const cel = ses.filter(s => s.dispositivo === "Celular").length;
+  h += `<div class="tarjeta ancho"><h2>Dispositivo</h2><p class="ayuda">${visitas ? `${pct(cel, visitas)}% entra desde el celular y ${100 - pct(cel, visitas)}% desde la computadora.` : "Sin visitas en este periodo."}</p></div>`;
+  h += `</div>`;
+  return h;
+}
+
+/* ---------- Ficha del lead ---------- */
+function abrirFicha(folio){
+  fichaFolio = folio;
+  const f = $("ficha"); f.hidden = false;
+  requestAnimationFrame(() => { f.classList.add("abierta"); $("velo").classList.add("abierto"); });
+  pintarFicha();
+  $("ficha-cuerpo").scrollTop = 0;
+  setTimeout(() => $("cerrar-ficha").focus(), 50);
+}
+function cerrarFicha(){
+  const f = $("ficha"); f.classList.remove("abierta"); $("velo").classList.remove("abierto");
+  setTimeout(() => { if(!f.classList.contains("abierta")) f.hidden = true; }, 340);
+  fichaFolio = null;
+}
+$("cerrar-ficha").onclick = cerrarFicha;
+$("velo").onclick = cerrarFicha;
+document.addEventListener("keydown", e => { if(e.key === "Escape" && fichaFolio) cerrarFicha(); });
+
+function msjCliente(l){
+  const n = primerNombre(l.nombre);
+  return apartoVisita(l) && ["Nuevo","Contactado"].includes(l.seguimiento)
+    ? `Hola ${n}, soy el Ing. Daniel García de Armadillo Diseño. Vi que apartaste tu visita técnica para el ${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""}. ¿Me compartes la dirección para dejarla confirmada?`
+    : `Hola ${n}, soy el Ing. Daniel García de Armadillo Diseño. Recibí tu diagnóstico de cocina${l.forma ? " (" + l.forma.toLowerCase() + (l.zona ? ", " + l.zona : "") + ")" : ""}. ¿Te parece si agendamos la visita técnica para medir tu espacio?`;
+}
+function fichaTexto(l){
+  return [`Lead Armadillo · ${l.nombre} (prioridad ${l.prioridad})`, `WhatsApp: ${l.tel}`,
+    [l.forma, l.acabado, l.inversion, l.tiempo, l.zona].filter(Boolean).join(" · "),
+    apartoVisita(l) ? `Apartó visita: ${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""}` : "",
+    `Seguimiento: ${l.seguimiento}`, `Folio ${l.folio}`].filter(Boolean).join("\n");
+}
+function pintarFicha(){
+  if(!fichaFolio) return;
+  const l = datos.leads.find(x => x.folio === fichaFolio); if(!l){ cerrarFicha(); return; }
+  const dato = (k, v) => v ? `<div class="dato"><span>${k}</span><b>${esc(v)}</b></div>` : "";
+  const notas = l.notas ? l.notas.split("\n").filter(Boolean).reverse().map(n => { const m = n.match(/^(.+?) · (.*)$/); return m ? `<p><small>${esc(m[1])}</small>${esc(m[2])}</p>` : `<p>${esc(n)}</p>`; }).join("") : "";
+  const hist = l.historial ? l.historial.split("\n").filter(Boolean).reverse().map(n => `<p>${esc(n)}</p>`).join("") : "";
+  const vf = l.visitaFecha;
+  let h = `<div class="persona"><span class="avatar ${esc(l.prioridad)}">${esc(iniciales(l.nombre))}</span>
+    <h2 id="ficha-nombre">${esc(l.nombre)}</h2><p>Folio ${esc(l.folio)} · llegó ${hace(l.fecha)}</p>
+    <div class="pills"><span class="pill ${claseEtapa(l.seguimiento)}">${esc(l.seguimiento)}</span><span class="pill" style="background:var(--fill2)"><span class="punto ${esc(l.prioridad)}"></span>Prioridad ${esc(l.prioridad.toLowerCase())}</span>${l.escribio ? `<span class="pill" style="background:var(--fill2)">Abrió WhatsApp</span>` : ""}</div></div>`;
+  h += `<div class="acciones">
+    <a class="accion" id="a-wa" href="https://wa.me/52${esc(l.tel)}?text=${encodeURIComponent(msjCliente(l))}" target="_blank" rel="noopener">${I.wa}WhatsApp</a>
+    <a class="accion" id="a-tel" href="tel:+52${esc(l.tel)}">${I.tel}Llamar</a>
+    <a class="accion" href="https://wa.me/${WHATSAPP_DANIEL}?text=${encodeURIComponent(fichaTexto(l))}" target="_blank" rel="noopener">${I.enviar}A Daniel</a></div>`;
+  if(apartoVisita(l) || l.visitaDia){
+    h += `<p class="seccion-t">Visita técnica</p><div class="caja"><div class="visita-caja">
+      <span class="cal"><small>${vf ? vf.toLocaleDateString("es-MX",{weekday:"short"}).replace(".","") : "—"}</small><b>${vf ? vf.getDate() : "?"}</b></span>
+      <span class="txt"><b>${esc(l.visitaDia || "Sin fecha")}</b><span>${esc(l.visitaHora || "")}</span></span>
+      ${l.seguimiento === "Nuevo" || l.seguimiento === "Contactado" ? `<button class="btn chico" id="confirmar-visita">Confirmar</button>` : ""}</div></div>`;
+  }
+  h += `<p class="seccion-t">Seguimiento</p><div class="caja"><div class="etapas" role="group" aria-label="Etapa de seguimiento">${ETAPAS.map(e =>
+    `<button data-etapa="${e}" aria-pressed="${l.seguimiento === e}">${e}</button>`).join("")}</div>
+    ${l.ultimoContacto ? `<div class="dato"><span>Último contacto</span><b>${hace(l.ultimoContacto)}</b></div>` : `<div class="dato"><span>Último contacto</span><b style="color:var(--red)">Sin contactar</b></div>`}</div>`;
+  h += `<p class="seccion-t">Próximo contacto</p><div class="caja">
+    <div class="linea-form"><input type="date" id="f-proximo" value="${l.proximo ? isoDia(l.proximo) : ""}" aria-label="Fecha de próximo contacto"><button class="btn chico sec" id="g-proximo">Guardar</button></div>
+    <div class="rapidos"><button data-dias="1">Mañana</button><button data-dias="3">En 3 días</button><button data-dias="7">En 1 semana</button>${l.proximo ? `<button data-dias="0">Quitar</button>` : ""}</div></div>`;
+  h += `<p class="seccion-t">Diagnóstico</p><div class="caja">
+    ${dato("WhatsApp", l.tel)}${dato("Zona", l.zona)}${dato("Inversión", l.inversion)}${dato("Tiempo", l.tiempo)}
+    ${dato("Etapa", l.etapa)}${dato("Uso", l.uso)}${dato("Distribución", l.forma)}${dato("Muro", l.tamano)}${dato("Acabados", l.acabado)}
+    ${l.rango.length === 2 ? dato("Rango interno", fmtPesos(l.rango[0]) + " – " + fmtPesos(l.rango[1])) : ""}
+    ${dato("Anuncio", l.anuncio)}${dato("Dispositivo", l.dispositivo)}</div>`;
+  h += `<p class="seccion-t">Cierre</p><div class="caja"><div class="linea-form"><input type="number" inputmode="numeric" id="f-monto" placeholder="Monto cerrado en pesos" value="${l.monto || ""}" aria-label="Monto cerrado"><button class="btn chico sec" id="g-monto">Guardar</button></div></div>`;
+  h += `<p class="seccion-t">Notas</p><div class="caja"><div class="linea-form"><textarea id="f-nota" placeholder="Agrega una nota de la llamada o la visita" aria-label="Nueva nota"></textarea></div>
+    <div class="rapidos"><button class="btn chico" id="g-nota" style="color:#fff">Agregar nota</button></div>${notas ? `<div class="notas">${notas}</div>` : ""}</div>`;
+  if(hist) h += `<div class="caja" style="margin-top:12px"><details class="hist"><summary>Ver historial</summary><div class="notas">${hist}</div></details></div>`;
+  $("ficha-cuerpo").innerHTML = h;
+
+  const contacto = tipo => { const c = { contacto: tipo }; if(l.seguimiento === "Nuevo") c.seguimiento = "Contactado"; guardar(l.folio, c); };
+  $("a-wa").onclick = () => contacto("WhatsApp enviado");
+  $("a-tel").onclick = () => contacto("Llamada");
+  const cv = $("confirmar-visita"); if(cv) cv.onclick = () => guardar(l.folio, { seguimiento: "Visita agendada", contacto: "Visita confirmada" }, "Visita confirmada");
+  document.querySelectorAll("[data-etapa]").forEach(b => b.onclick = () => { if(b.dataset.etapa !== l.seguimiento) guardar(l.folio, { seguimiento: b.dataset.etapa }, "Seguimiento: " + b.dataset.etapa); });
+  $("g-proximo").onclick = () => guardar(l.folio, { proximo: $("f-proximo").value }, $("f-proximo").value ? "Próximo contacto guardado" : "Próximo contacto quitado");
+  document.querySelectorAll("[data-dias]").forEach(b => b.onclick = () => {
+    const n = Number(b.dataset.dias); const d = hoyInicio(); d.setDate(d.getDate() + n);
+    guardar(l.folio, { proximo: n ? isoDia(d) : "" }, n ? "Próximo contacto guardado" : "Próximo contacto quitado");
+  });
+  $("g-monto").onclick = () => guardar(l.folio, { monto: $("f-monto").value }, "Monto guardado");
+  $("g-nota").onclick = () => { const t = $("f-nota").value.trim(); if(!t){ $("f-nota").focus(); toast("Escribe la nota antes de agregarla."); return; } guardar(l.folio, { nota: t }, "Nota agregada"); };
+}
+
+/* ---------- Sesión ---------- */
+function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("ver"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("ver"), 2600); }
+function entrar(){
+  $("login").classList.add("oculto"); $("app").classList.remove("oculto");
+  $("principal").innerHTML = `<div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div>`;
+  sincronizar();
+}
+function salir(msj){
+  store.del("ad_crm_clave"); clave = ""; datos = { leads: [], sesiones: [] }; ultimaSync = 0;
+  cerrarFicha();
+  $("app").classList.add("oculto"); $("login").classList.remove("oculto");
+  $("error-login").textContent = msj || ""; $("clave").value = ""; $("clave").focus();
+}
+$("form-login").onsubmit = async e => {
+  e.preventDefault();
+  const v = $("clave").value.trim();
+  if(!v){ $("error-login").textContent = "Escribe la clave de acceso."; return; }
+  $("btn-entrar").textContent = "Entrando…";
+  clave = v;
+  try{
+    const r = await api({ accion: "datos" });
+    if(!r.ok){ $("error-login").textContent = r.error === "clave" ? "La clave no es correcta." : "No pudimos entrar. Inténtalo de nuevo."; clave = ""; return; }
+    store.set("ad_crm_clave", v);
+    datos.leads = r.leads.map(normLead).sort((a,b) => b.fecha - a.fecha);
+    datos.sesiones = r.sesiones.map(normSesion);
+    ultimaSync = Date.now();
+    $("login").classList.add("oculto"); $("app").classList.remove("oculto");
+    render(); actualizarSync();
+  }catch(err){ $("error-login").textContent = "No pudimos conectar. Revisa tu conexión."; clave = ""; }
+  finally{ $("btn-entrar").textContent = "Entrar"; }
+};
+setInterval(() => { if(clave && document.visibilityState === "visible") sincronizar(); }, 60000);
+setInterval(actualizarSync, 30000);
+document.addEventListener("visibilitychange", () => { if(clave && document.visibilityState === "visible" && Date.now() - ultimaSync > 30000) sincronizar(); });
+
+/* ---------- Datos de ejemplo (abrir con ?demo) ---------- */
+function demoApi(p){
+  if(!demoApi.d){
+    let seed = 7; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const pick = a => a[Math.floor(r() * a.length)];
+    const nombres = ["Laura Méndez","Ricardo Sosa","Fernanda Ruiz","Jorge Castillo","Mariana López","Alejandro Vega","Patricia Núñez","Héctor Ramírez","Sofía Herrera","Daniela Ortiz","Luis Paredes","Gabriela Cruz","Andrés Molina","Verónica Salas","Eduardo Ríos","Claudia Torres","Miguel Ángel Flores","Ana Lucía Peña","Roberto Gil","Isabel Navarro","Óscar Delgado","Lorena Campos"];
+    const anuncios = ["P1 Más cara que una de lujo","P2 Cocina del pasado","P3 Señales carpintero","P4 Lo que reviso","P5 Invierte mil",""];
+    const now = Date.now(), ses = [], leads = [];
+    for(let d = 0; d < 30; d++){
+      const n = 18 + Math.floor(r() * 22);
+      for(let i = 0; i < n; i++){
+        const inicio = now - d * DIA - Math.floor(r() * DIA * .9);
+        let paso = 1; const ret = [.62,.86,.9,.93,.88,.8,.95,.92,.3];
+        for(const q of ret){ if(r() < q) paso++; else break; }
+        const datosOk = paso >= 10 || (paso === 9 && r() < .25);
+        ses.push({ "Inicio": inicio, "Paso máximo": paso, "Llegó al formulario": paso >= 9 ? "Sí" : "No", "Dejó datos": datosOk ? "Sí" : "No",
+          "Apartó visita": datosOk && r() < .38 ? "Sí" : "No", "Abrió WhatsApp": datosOk && r() < .5 ? "Sí" : "No",
+          "Anuncio": pick(anuncios), "Dispositivo": r() < .84 ? "Celular" : "Computadora" });
+      }
+    }
+    ses.filter(s => s["Dejó datos"] === "Sí").forEach((s, i) => {
+      const inv = pick(["$150,000 a $250,000","$150,000 a $250,000","$250,000 a $400,000","Más de $400,000","Menos de $150,000","Prefiero que me orienten"]);
+      const tiempo = pick(["Lo antes posible","En 1 a 3 meses","En 1 a 3 meses","En 3 a 6 meses","Todavía sin fecha"]);
+      const prio = inv === "Menos de $150,000" || tiempo === "Todavía sin fecha" ? "Baja" : (tiempo === "Lo antes posible" && inv !== "$150,000 a $250,000") ? "Alta" : pick(["Alta","Media"]);
+      const ap = s["Apartó visita"] === "Sí";
+      const edad = (now - s["Inicio"]) / DIA;
+      const seg = edad < 1.2 ? "Nuevo" : pick(["Contactado","Visita agendada","Visita realizada","Propuesta enviada","Ganado","Perdido","Contactado","Nuevo"]);
+      const vf = new Date(s["Inicio"] + (2 + Math.floor(r()*4)) * DIA); vf.setHours(0,0,0,0);
+      const rango = inv.includes("400,000") && inv.startsWith("Más") ? "300000-420000" : inv.includes("250,000 a") ? "220000-300000" : "180000-220000";
+      leads.push({ "Fecha": s["Inicio"] + 90000, "Folio": "AD-" + (4100 + i), "Estado": ap ? "Visita apartada" : "Diagnóstico completo", "Prioridad": prio,
+        "Nombre": nombres[i % nombres.length], "WhatsApp": "222" + String(1000000 + Math.floor(r()*8999999)),
+        "Etapa": pick(["Casa nueva","Quiero renovarla","Estoy en obra","Estoy viendo ideas"]), "Uso": pick(["Se cocina a diario","Ahí se reúne la familia","Desayunos y cenas rápidas"]),
+        "Distribución": pick(["En L","Con isla","En U","Un muro","No estoy seguro"]), "Muro principal": pick(["De 3 a 5 m","De 5 a 7 m","Menos de 3 m"]),
+        "Acabados": pick(["Funcional y muy bien hecha","Diseño y materiales seleccionados","Alta gama, sin concesiones"]), "Inversión": inv, "Tiempo": tiempo,
+        "Zona": pick(["Angelópolis o Lomas","Cholula o San Andrés","Cholula o San Andrés","Atlixco","Cuautlancingo o zona norte","Otra zona de Puebla"]),
+        "Visita día": ap ? vf.toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long"}) : "", "Visita horario": ap ? pick(["por la mañana (9 a 12)","a mediodía (12 a 3)","por la tarde (3 a 6)"]) : "",
+        "Visita fecha": ap ? vf.getTime() : "", "Escribió por WhatsApp": s["Abrió WhatsApp"], "Rango estimado (interno)": rango, "Anuncio": s["Anuncio"],
+        "Monto cerrado": seg === "Ganado" ? 180000 + Math.floor(r() * 18) * 10000 : "", "Seguimiento": seg,
+        "Último contacto": seg !== "Nuevo" ? s["Inicio"] + DIA * .5 : "", "Próximo contacto": ["Contactado","Propuesta enviada"].includes(seg) && r() < .6 ? now - Math.floor(r()*2) * DIA : "",
+        "Notas": seg !== "Nuevo" && r() < .5 ? "20/10 12:40 · Le interesa isla con barra. Quiere ver muestras de madera." : "",
+        "Historial": "20/10 11:02 · Llegó desde la landing", "Dispositivo": s["Dispositivo"] });
+    });
+    demoApi.d = { leads, sesiones: ses };
+  }
+  if(p.accion === "datos") return Promise.resolve({ ok: true, leads: demoApi.d.leads, sesiones: demoApi.d.sesiones });
+  if(p.accion === "guardar"){
+    const l = demoApi.d.leads.find(x => x["Folio"] === p.folio); const c = JSON.parse(p.cambios);
+    if(c.seguimiento) l["Seguimiento"] = c.seguimiento;
+    if(c.contacto) l["Último contacto"] = Date.now();
+    if(c.proximo !== undefined) l["Próximo contacto"] = c.proximo;
+    if(c.monto !== undefined) l["Monto cerrado"] = c.monto;
+    if(c.nota) l["Notas"] = (l["Notas"] ? l["Notas"] + "\n" : "") + "ahora · " + c.nota;
+    return Promise.resolve({ ok: true, lead: l });
+  }
+}
+
+/* ---------- Inicio ---------- */
+if(DEMO){ clave = "demo"; entrar(); }
+else if(clave) entrar();
+else $("clave").focus();
+</script>
+</body>
+</html>

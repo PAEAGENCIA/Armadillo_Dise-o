@@ -584,7 +584,7 @@ dialog::backdrop{background:rgba(5,10,10,.7)}
 /* ============ CONFIGURACIÓN (editar antes de publicar) ============ */
 const CONFIG = {
   pixelId: "",                       // ID de tu píxel de Meta (solo números). Vacío = sin píxel.
-  whatsapp: "520000000000",           // WhatsApp de Daniel con lada 52, sin espacios
+  whatsapp: "522221367108",           // WhatsApp del Ing. Daniel García, con lada 52 y sin espacios
   sheetEndpoint: "https://script.google.com/macros/s/AKfycbxaxYx2Esw2nu3v2PPYmvPWl3ipeXG1lczlPagHxst3H0MCP9V8NTSFjdcW4AZm1ksF/exec",                  // URL de Google Apps Script que guarda cada lead en el CRM. NECESARIO para no perder contactos.
   instagram: "https://www.instagram.com/armadillo.proyecto/",
   // Rangos internos (NO se muestran al cliente; llegan al CRM). Muro de 3 a 5 m. CONFIRMAR CON DANIEL.
@@ -702,6 +702,7 @@ function lateral(){
 function pintar(){
   fase = "preguntas";
   const p = preguntas[paso];
+  avanzar(paso + 1);
   $("paso-txt").textContent = `Paso ${paso + 1} de ${TOTAL}`;
   atras.hidden = paso === 0;
   const cls = p.tipo === "tres" ? "ops tres" : "ops";
@@ -747,6 +748,7 @@ function enfocar(){
 
 function formulario(){
   fase = "contacto";
+  avanzar(TOTAL + 1);
   $("paso-txt").textContent = "Último paso";
   atras.hidden = false;
   zona.innerHTML = `<div class="anim">
@@ -840,6 +842,7 @@ function fechaRender(){
 
 function resultado(){
   fase = "resultado";
+  avanzar(TOTAL + 2);
   $("paso-txt").textContent = "Diagnóstico listo";
   atras.hidden = true;
   const revisar = ["Medidas exactas, niveles de muros y piso","Instalaciones de agua, luz y gas","Electrodomésticos que conservas o vas a comprar"];
@@ -998,13 +1001,37 @@ function linkWA(final){
   const msg = `Hola, soy ${contacto.nombre}. Hice el diagnóstico de cocina (folio ${folio}):\n${lineas.join("\n")}\n\n${final || "Me interesa agendar mi visita técnica."}`;
   return `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
 }
-function guardar(evento){
-  if(!CONFIG.sheetEndpoint) return;
+/* ===== Medición: una sesión por visitante, enviada al CRM ===== */
+const SID = (() => {
+  try{ const s = sessionStorage.getItem("ad_sid"); if(s) return s; }catch(e){}
+  const n = "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  try{ sessionStorage.setItem("ad_sid", n); }catch(e){}
+  return n;
+})();
+const ORIGEN = (() => {
   const q = new URLSearchParams(location.search);
-  const d = { evento, folio, visita_dia:visita.diaL, visita_horario:visita.hora, fecha:new Date().toISOString(), nombre:contacto.nombre, telefono:contacto.tel,
-    rango_estimado:rangoInterno(), prioridad:prioridad(), anuncio:q.get("utm_content") || "", campana:q.get("utm_campaign") || "" };
+  return {
+    anuncio: q.get("utm_content") || "", campana: q.get("utm_campaign") || "", fuente: q.get("utm_source") || "",
+    dispositivo: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "Celular" : "Computadora",
+    referencia: (document.referrer || "").replace(/^https?:\/\//, "").split("/")[0]
+  };
+})();
+function enviar(d){
+  if(!CONFIG.sheetEndpoint) return;
+  const cuerpo = JSON.stringify(Object.assign({ sid: SID }, ORIGEN, d));
+  try{
+    if(navigator.sendBeacon && navigator.sendBeacon(CONFIG.sheetEndpoint, new Blob([cuerpo], { type: "text/plain" }))) return;
+  }catch(e){}
+  try{ fetch(CONFIG.sheetEndpoint, { method: "POST", mode: "no-cors", keepalive: true, body: cuerpo }); }catch(e){}
+}
+let pasoMax = 0;
+function avanzar(n){ if(n > pasoMax){ pasoMax = n; enviar({ evento: "progreso", paso: n }); } }
+function guardar(evento){
+  const d = { evento, folio, fecha:new Date().toISOString(), nombre:contacto.nombre, telefono:contacto.tel,
+    rango_estimado:rangoInterno(), prioridad:prioridad() };
+  if(apartado){ d.visita_dia = visita.diaL; d.visita_horario = visita.hora; d.visita_fecha = visita.dia; }
   preguntas.forEach(p => d[p.id] = etiqueta(p));
-  try{ fetch(CONFIG.sheetEndpoint, {method:"POST", mode:"no-cors", body:JSON.stringify(d)}); }catch(e){}
+  enviar(d);
 }
 
 
@@ -1049,6 +1076,7 @@ flot.onclick = () => {
   if(foco) setTimeout(() => foco.focus({ preventScroll: true }), reduce ? 0 : 450);
 };
 
+enviar({ evento: "visita" });
 pintar();
 </script>
 </body>
