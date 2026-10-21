@@ -262,6 +262,13 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .enlace-wa{display:inline-block;font-size:13.5px;color:#fff;text-decoration:underline;text-underline-offset:3px}
 @media (max-width:820px){.precio-visita{grid-template-columns:1fr}.precio-visita ul{grid-template-columns:1fr 1fr}}
 
+
+.aviso-bajo{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;background:rgba(217,174,115,.14);border:1px solid rgba(217,174,115,.4);border-radius:14px;padding:12px 14px;margin-bottom:16px}
+.aviso-bajo svg{color:var(--madera);margin-top:2px}
+.aviso-bajo p{font-size:13.5px !important;color:#E6EBEA !important;margin-top:0 !important;line-height:1.5}
+.aviso-bajo b{color:#fff;font-weight:500}
+.alt-wa{margin-top:12px !important;text-align:center}
+.alt-wa a{font-size:13.5px;color:#C8CFCD;text-decoration:underline;text-underline-offset:3px}
 /* Botón fijo en celular */
 .flotante{display:none}
 @media (max-width:820px){
@@ -653,7 +660,7 @@ const preguntas = [
       {v:"diseno", t:"Diseño y materiales seleccionados", s:"Más detalle y mejores herrajes"},
       {v:"alta", t:"Alta gama, sin concesiones", s:"Lo mejor en materiales y herrajes"} ], acuse:"Anotado." },
   { id:"presupuesto", campo:"Inversión", q:"Para proponerte materiales que encajen contigo, ¿qué inversión tienes contemplada?", ayuda:"Es solo una referencia. Nos ayuda a no proponerte algo fuera de lo que buscas.", op:[
-      {v:"hasta150", t:"Hasta $150,000", a:"Gracias por decirlo. Al final te contamos qué se puede hacer bien con esa inversión."},
+      {v:"hasta150", t:"Menos de $150,000", a:"Gracias por decirlo. Al final te contamos qué se puede hacer bien con esa inversión."},
       {v:"150a250", t:"$150,000 a $250,000", a:"Perfecto. Es un rango donde se logran cocinas muy bien resueltas."},
       {v:"250a400", t:"$250,000 a $400,000", a:"Excelente. Con ese rango ya se eligen materiales y herrajes de mejor nivel."},
       {v:"mas400", t:"Más de $400,000", a:"Excelente. Hay espacio para materiales de alta gama y piezas especiales."},
@@ -855,8 +862,9 @@ function resultado(){
   }
   const prop = diasVisita()[1];
   if(!visita.dia){ visita.dia = prop.iso; visita.diaL = prop.largo; visita.hora = HORARIOS[0].l; }
-  const agendaHTML = bajo ? "" : `
+  const agendaHTML = `
         <div class="w agenda" id="agenda">
+          ${bajo ? `<div class="aviso-bajo">${svg("info")}<p><b>Nuestras cocinas integrales parten de $150,000.</b> Si tu presupuesto es menor, en la visita te decimos con honestidad qué se puede hacer bien con él, o cómo hacer tu cocina por etapas.</p></div>` : ""}
           <div class="ag-cab">
             <div><h3>${svg("tiempo")}Tu siguiente paso: la visita técnica a tu casa</h3>
               <p class="ag-tit">Te proponemos este horario</p></div>
@@ -884,11 +892,12 @@ function resultado(){
             <p><b>¿Por qué tiene costo?</b> Porque vamos a tu casa a medir de verdad y te entregamos un proyecto con render, no una cotización al aire. Por eso se abona completo cuando contratas.</p>
             <button type="button" class="btn" id="apartar">Apartar mi visita <span class="flecha">${svg("flecha")}</span></button>
           </div>
+          ${bajo ? `<p class="alt-wa"><a id="platicar" href="${linkWA("Antes de agendar, me gustaría platicar mi caso.")}" target="_blank" rel="noopener">Prefiero platicar mi caso por WhatsApp primero</a></p>` : ""}
         </div>`;
   zona.innerHTML = `<div class="anim">
       <div class="res-cab"><div><h2 class="q" tabindex="-1">${primer}, este es tu diagnóstico</h2>
       <p class="q-ayuda">Lo preparamos con tus respuestas y con lo que hemos aprendido en cada cocina que fabricamos.</p></div>
-      ${bajo ? "" : `<a class="btn-osc" href="#agenda">${svg("tiempo")}Agendar visita</a>`}</div>
+      <a class="btn-osc" href="#agenda">${svg("tiempo")}Agendar visita</a></div>
       <div class="res-grid">
         <div class="w perfil"><img src="${FOTO_PERFIL}" alt="Cocina con lámparas colgantes y madera, proyecto de Armadillo">
           <div><h3>${svg("forma")}Perfil de tu proyecto</h3><strong>${titulo[R.forma] || titulo.nose} ${enfoque[R.uso] || ""}</strong></div></div>
@@ -907,17 +916,18 @@ function resultado(){
           <ul>${errores[R.forma].map(e => `<li>${svg("x")}<span>${e}</span></li>`).join("")}</ul>
           <p class="mini-nota">Los revisamos uno por uno antes de fabricar.</p></div>
 
-        <div class="w"><h3>${svg("regla")}Lo que revisaríamos en tu visita técnica</h3><ul>${revisar.map(x => `<li>${svg("check")}<span>${x}</span></li>`).join("")}</ul>${bajo ? "" : `<p class="mini-nota">La visita a tu casa cuesta $1,000 y se abona al 100% a tu cocina.</p>`}</div>
+        <div class="w"><h3>${svg("regla")}Lo que revisaríamos en tu visita técnica</h3><ul>${revisar.map(x => `<li>${svg("check")}<span>${x}</span></li>`).join("")}</ul><p class="mini-nota">La visita a tu casa cuesta $1,000 y se abona al 100% a tu cocina.</p></div>
         <div class="w"><h3>${svg("lupa")}Antes de contratar a cualquier carpintero, pregunta</h3>
           <ul>${preguntasCarpintero.map(x => `<li>${svg("check")}<span>${x}</span></li>`).join("")}</ul>
           <p class="mini-nota">En Armadillo la respuesta a las cuatro es sí.</p></div>
 
-        ${bajo ? `<div class="w paso">${paso}</div>` : agendaHTML}
+        ${agendaHTML}
       </div>
       <p class="res-nota">${sinPrisa ? `¿Todavía explorando? <a href="${CONFIG.instagram}" target="_blank" rel="noopener">Mira nuestros proyectos en Instagram</a>. ` : ""}Folio ${folio}.${lejos ? " Para casas fuera de Puebla confirmamos cobertura por mensaje." : ""}</p></div>`;
   lateral(); actualizarFlotante();
-  if(bajo){ $("wa").onclick = () => { guardar("clic_whatsapp"); if(typeof window.fbq === "function") window.fbq("track","Contact"); }; }
-  else conectarAgenda();
+  conectarAgenda();
+  const alt = $("platicar");
+  if(alt) alt.onclick = () => { guardar("clic_whatsapp"); if(typeof window.fbq === "function") window.fbq("track","Contact"); };
 }
 
 const HORARIOS = [{l:"por la mañana (9 a 12)", t:"Mañana", r:"9 a 12"},{l:"a mediodía (12 a 3)", t:"Mediodía", r:"12 a 3"},{l:"por la tarde (3 a 6)", t:"Tarde", r:"3 a 6"}];
@@ -1015,10 +1025,9 @@ function actualizarFlotante(){
   const hechas = preguntas.filter(x => R[x.id]).length;
   let tit, sub, destino;
   if(fase === "resultado"){
-    const bajo = R.presupuesto === "hasta150";
-    destino = bajo ? zona.querySelector(".w.paso") : $("agenda");
-    tit = bajo ? "Platicar mi caso" : apartado ? "Ver mi visita apartada" : "Apartar mi visita técnica";
-    sub = bajo ? "Te orientamos por WhatsApp" : apartado ? "Confírmala por WhatsApp" : "Ya te propusimos un horario";
+    destino = $("agenda");
+    tit = apartado ? "Ver mi visita apartada" : "Apartar mi visita técnica";
+    sub = apartado ? "Confírmala por WhatsApp" : "Ya te propusimos un horario";
   } else if(fase === "contacto"){
     tit = "Ver mi diagnóstico"; sub = "Solo falta tu nombre y WhatsApp"; destino = zona;
   } else if(hechas === 0){
