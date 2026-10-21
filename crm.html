@@ -118,6 +118,13 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .pill.e-Ganado{background:color-mix(in srgb,var(--green) 16%,transparent);color:color-mix(in srgb,var(--green) 75%,var(--text))}
 .pill.e-Perdido{background:var(--fill);color:var(--text2)}
 .pill.visita{background:var(--madera-tint);color:var(--madera)}
+.pill.wa{background:color-mix(in srgb,var(--green) 15%,transparent);color:color-mix(in srgb,var(--green) 70%,var(--text))}
+.pill.wa svg{width:13px;height:13px;stroke-width:2}
+.wa-ok{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,var(--green) 16%,transparent);color:color-mix(in srgb,var(--green) 70%,var(--text));flex:none}
+.wa-ok svg{width:13px;height:13px;stroke-width:2.2}
+.accion.hecho{color:var(--text2)}
+.aviso-wa{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--green) 11%,transparent);font-size:13.5px;line-height:1.4}
+.aviso-wa svg{width:18px;height:18px;color:color-mix(in srgb,var(--green) 70%,var(--text));margin-top:1px}
 .punto{width:7px;height:7px;border-radius:50%;flex:none;display:inline-block}
 .punto.Alta{background:var(--accent)}.punto.Media{background:var(--madera)}.punto.Baja{background:var(--text3)}
 .vacio{padding:34px 20px;text-align:center;color:var(--text2)}
@@ -502,7 +509,7 @@ function filaLead(l, extra){
   const tarde = porAtender(l) && Date.now() - l.fecha > DIA;
   return `<button class="fila" data-lead="${esc(l.folio)}">
     <span class="avatar ${esc(l.prioridad)}">${esc(iniciales(l.nombre))}</span>
-    <span class="txt"><span class="t1">${esc(l.nombre)}${apartoVisita(l) ? ` <span class="pill visita">Apartó visita</span>` : ""}</span><span class="t2">${esc(sub)}</span></span>
+    <span class="txt"><span class="t1">${esc(l.nombre)}${l.escribio ? ` <span class="wa-ok" title="Ya le escribió a Daniel por WhatsApp" aria-label="Ya le escribió a Daniel por WhatsApp">${I.wa}</span>` : ""}${apartoVisita(l) ? ` <span class="pill visita">Apartó visita</span>` : ""}</span><span class="t2">${esc(sub)}</span></span>
     <span class="der"><span class="pill ${claseEtapa(l.seguimiento)}">${esc(l.seguimiento)}</span><span class="tiempo ${tarde ? "tarde" : ""}">${hace(l.fecha)}</span></span>
     ${I.chev}</button>`;
 }
@@ -538,7 +545,7 @@ function vistaHoy(){
   if(!p.total && !p.proximas.length){
     h += `<div class="grupo-titulo"><b>Pendientes</b></div><div class="lista">${vacio("Todo al día", "No hay leads por atender. Los nuevos aparecen aquí en cuanto llegan.")}</div>`;
   }
-  h += bloque("Visitas por confirmar", "Escríbeles para confirmar la dirección", p.confirmar, l => `${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""} · ${l.zona}`);
+  h += bloque("Visitas por confirmar", "Escríbeles para confirmar la dirección", p.confirmar, l => `${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""} · ${l.escribio ? "ya le escribió a Daniel" : l.zona}`);
   h += bloque("Nuevos sin contactar", "Los más antiguos primero", p.nuevos);
   h += bloque("Seguimientos para hoy", "Fecha de próximo contacto vencida o de hoy", p.seguimientos, l => `Contactar: ${l.proximo.toLocaleDateString("es-MX",{day:"numeric",month:"short"})} · ${l.zona}`);
   h += bloque("Próximas visitas", "Visitas técnicas confirmadas", p.proximas, l => `${l.visitaFecha.toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short"})}${l.visitaHora ? " · " + l.visitaHora : ""}`);
@@ -550,6 +557,7 @@ const FILTROS = [
   ["todos", "Todos", () => true],
   ["atender", "Por atender", porAtender],
   ["visita", "Apartó visita", apartoVisita],
+  ["escribio", "Ya escribió a Daniel", l => l.escribio],
   ["alta", "Prioridad alta", l => l.prioridad === "Alta"],
   ["proceso", "En proceso", l => ["Contactado","Visita agendada","Visita realizada","Propuesta enviada"].includes(l.seguimiento)],
   ["ganados", "Ganados", l => l.seguimiento === "Ganado"],
@@ -696,11 +704,12 @@ function pintarFicha(){
   const vf = l.visitaFecha;
   let h = `<div class="persona"><span class="avatar ${esc(l.prioridad)}">${esc(iniciales(l.nombre))}</span>
     <h2 id="ficha-nombre">${esc(l.nombre)}</h2><p>Folio ${esc(l.folio)} · llegó ${hace(l.fecha)}</p>
-    <div class="pills"><span class="pill ${claseEtapa(l.seguimiento)}">${esc(l.seguimiento)}</span><span class="pill" style="background:var(--fill2)"><span class="punto ${esc(l.prioridad)}"></span>Prioridad ${esc(l.prioridad.toLowerCase())}</span>${l.escribio ? `<span class="pill" style="background:var(--fill2)">Abrió WhatsApp</span>` : ""}</div></div>`;
+    <div class="pills"><span class="pill ${claseEtapa(l.seguimiento)}">${esc(l.seguimiento)}</span><span class="pill" style="background:var(--fill2)"><span class="punto ${esc(l.prioridad)}"></span>Prioridad ${esc(l.prioridad.toLowerCase())}</span>${l.escribio ? `<span class="pill wa">${I.wa}Ya le escribió a Daniel</span>` : ""}</div></div>`;
   h += `<div class="acciones">
     <a class="accion" id="a-wa" href="https://wa.me/52${esc(l.tel)}?text=${encodeURIComponent(msjCliente(l))}" target="_blank" rel="noopener">${I.wa}WhatsApp</a>
     <a class="accion" id="a-tel" href="tel:+52${esc(l.tel)}">${I.tel}Llamar</a>
-    <a class="accion" href="https://wa.me/${WHATSAPP_DANIEL}?text=${encodeURIComponent(fichaTexto(l))}" target="_blank" rel="noopener">${I.enviar}A Daniel</a></div>`;
+    <a class="accion ${l.escribio ? "hecho" : ""}" href="https://wa.me/${WHATSAPP_DANIEL}?text=${encodeURIComponent(fichaTexto(l))}" target="_blank" rel="noopener">${l.escribio ? I.ok + "Ya lo tiene" : I.enviar + "A Daniel"}</a></div>
+    ${l.escribio ? `<p class="aviso-wa">${I.ok}<span>Este lead tocó el botón de WhatsApp en la landing, así que el chat con Daniel se abrió con su diagnóstico ya escrito. No hace falta reenviárselo. Lo único que no podemos saber es si de verdad mandó el mensaje.</span></p>` : ""}`;
   if(apartoVisita(l) || l.visitaDia){
     h += `<p class="seccion-t">Visita técnica</p><div class="caja"><div class="visita-caja">
       <span class="cal"><small>${vf ? vf.toLocaleDateString("es-MX",{weekday:"short"}).replace(".","") : "—"}</small><b>${vf ? vf.getDate() : "?"}</b></span>
