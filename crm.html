@@ -274,6 +274,7 @@ details.hist .notas p{font-size:13px;color:var(--text2)}
   .ficha-cab .grab{display:block;position:absolute;left:50%;top:6px;transform:translateX(-50%);width:36px;height:5px;border-radius:99px;background:var(--text3)}
   .tabla td:first-child{max-width:130px}
 }
+.tabla-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.tabla-scroll .tabla{min-width:640px}.tabla td small{color:var(--text3);font-size:11px;margin-left:2px}
 </style>
 </head>
 <body>
@@ -628,10 +629,14 @@ function vistaMetricas(){
   // Por anuncio
   const grupos = {};
   ses.forEach(s => { const k = s.anuncio || "Sin anuncio (directo u orgánico)"; (grupos[k] = grupos[k] || { v:0, l:0, a:0 }).v++; if(s.datos) grupos[k].l++; if(s.visita) grupos[k].a++; });
-  const filasAn = Object.entries(grupos).sort((a, b) => b[1].l - a[1].l || b[1].v - a[1].v);
-  h += `<div class="tarjeta ancho"><h2>Por anuncio</h2><p class="ayuda">Qué anuncio trae más leads. Sale del parámetro utm_content de cada anuncio en Meta.</p>`;
-  h += filasAn.length ? `<table class="tabla"><thead><tr><th>Anuncio</th><th>Visitas</th><th>Leads</th><th>Conv.</th><th>Visitas ap.</th></tr></thead><tbody>${filasAn.map(([k, g]) =>
-    `<tr><td title="${esc(k)}">${esc(k)}</td><td>${fmtNum(g.v)}</td><td>${fmtNum(g.l)}</td><td>${pct(g.l, g.v)}%</td><td>${fmtNum(g.a)}</td></tr>`).join("")}</tbody></table>`
+  const calidad = {};
+  leads.forEach(l => { const k = l.anuncio || "Sin anuncio (directo u orgánico)"; const c = (calidad[k] = calidad[k] || { n:0, alta:0, ht:0, gan:0, monto:0 });
+    c.n++; if(l.prioridad === "Alta") c.alta++; if(/250,000 a|Más de \$400/.test(l.inversion)) c.ht++; if(l.seguimiento === "Ganado"){ c.gan++; c.monto += l.monto; }
+    if(!grupos[k]) grupos[k] = { v:0, l:0, a:0 }; });
+  const filasAn = Object.entries(grupos).sort((a, b) => (calidad[b[0]]?.ht || 0) - (calidad[a[0]]?.ht || 0) || b[1].l - a[1].l || b[1].v - a[1].v);
+  h += `<div class="tarjeta ancho"><h2>Por anuncio</h2><p class="ayuda">Qué anuncio trae los mejores leads, no solo los más. <b>+$250k</b> son leads que eligieron una inversión de $250,000 o más. Sale del parámetro utm_content de cada anuncio en Meta.</p>`;
+  h += filasAn.length ? `<div class="tabla-scroll"><table class="tabla"><thead><tr><th>Anuncio</th><th>Visitas</th><th>Leads</th><th>Conv.</th><th>+$250k</th><th>Prioridad alta</th><th>Visitas ap.</th><th>Ventas</th><th>Monto</th></tr></thead><tbody>${filasAn.map(([k, g]) => { const c = calidad[k] || { n:0, alta:0, ht:0, gan:0, monto:0 };
+    return `<tr><td title="${esc(k)}">${esc(k)}</td><td>${fmtNum(g.v)}</td><td>${fmtNum(g.l)}</td><td>${pct(g.l, g.v)}%</td><td>${fmtNum(c.ht)} <small>${pct(c.ht, c.n)}%</small></td><td>${pct(c.alta, c.n)}%</td><td>${fmtNum(g.a)}</td><td>${fmtNum(c.gan)}</td><td>${c.monto ? "$" + fmtNum(c.monto) : "–"}</td></tr>`; }).join("")}</tbody></table></div>`
     : vacio("Sin datos", "Aún no hay visitas en este periodo.");
   h += `</div>`;
 
