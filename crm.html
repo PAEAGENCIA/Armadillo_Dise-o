@@ -170,7 +170,7 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .barra-fila .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
 .barra-fila .p{text-align:right;font-variant-numeric:tabular-nums;color:var(--text2);font-size:13px}
 .barra-fila.alerta .barra i{background:var(--orange)}
-.etiqueta-alerta{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 12px;border-radius:10px;background:color-mix(in srgb,var(--orange) 13%,transparent);color:var(--text);font-size:13.5px}
+.etiqueta-alerta{display:inline-block;line-height:1.45;margin-top:12px;padding:8px 12px;border-radius:10px;background:color-mix(in srgb,var(--orange) 13%,transparent);color:var(--text);font-size:13.5px}
 .etiqueta-alerta b{font-weight:600}
 .tabla{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
 .tabla th{font-size:12px;color:var(--text2);font-weight:500;text-align:right;padding:6px 4px;border-bottom:1px solid var(--sep)}
@@ -274,7 +274,7 @@ details.hist .notas p{font-size:13px;color:var(--text2)}
   .ficha-cab .grab{display:block;position:absolute;left:50%;top:6px;transform:translateX(-50%);width:36px;height:5px;border-radius:99px;background:var(--text3)}
   .tabla td:first-child{max-width:130px}
 }
-.tabla-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.tabla-scroll .tabla{min-width:640px}.tabla td small{color:var(--text3);font-size:11px;margin-left:2px}
+.rejilla>*{min-width:0}.tabla-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}.tabla-scroll .tabla{min-width:640px}.tabla td small{color:var(--text3);font-size:11px;margin-left:2px}
 </style>
 </head>
 <body>
@@ -362,6 +362,7 @@ let clave = store.get("ad_crm_clave") || "";
 let datos = { leads: [], sesiones: [] };
 let vista = store.get("ad_crm_vista") || "hoy";
 let periodo = store.get("ad_crm_periodo") || "7";
+let embudoAnuncio = "todos";
 let filtro = "todos", busqueda = "", etapaFiltro = "";
 let fichaFolio = null, ultimaSync = 0, cargando = false;
 
@@ -473,13 +474,14 @@ function aplicarLocal(l, c){
 /* ---------- Navegación ---------- */
 function ir(v){ vista = v; store.set("ad_crm_vista", v); render(); window.scrollTo(0,0); }
 document.addEventListener("click", e => {
-  const b = e.target.closest("[data-ir],[data-accion],[data-lead],[data-filtro],[data-periodo],[data-etapa-filtro]");
+  const b = e.target.closest("[data-ir],[data-accion],[data-lead],[data-filtro],[data-periodo],[data-etapa-filtro],[data-embudo]");
   if(!b) return;
   if(b.dataset.ir) ir(b.dataset.ir);
   else if(b.dataset.lead) abrirFicha(b.dataset.lead);
   else if(b.dataset.filtro){ filtro = b.dataset.filtro; etapaFiltro = ""; render(); }
   else if(b.dataset.etapaFiltro !== undefined){ etapaFiltro = etapaFiltro === b.dataset.etapaFiltro ? "" : b.dataset.etapaFiltro; filtro = "todos"; render(); }
   else if(b.dataset.periodo){ periodo = b.dataset.periodo; store.set("ad_crm_periodo", periodo); render(); }
+  else if(b.dataset.embudo){ embudoAnuncio = b.dataset.embudo; render(); }
   else if(b.dataset.accion === "actualizar") sincronizar(true);
   else if(b.dataset.accion === "salir") salir();
 });
@@ -611,18 +613,34 @@ function vistaMetricas(){
     <div class="tile"><div class="et">${I.pesos}Vendido</div><div class="num">${fmtCorto(vendido)}</div><div class="sub">monto cerrado registrado</div></div>
   </div>`;
 
-  // Embudo del diagnóstico
-  const pasos = [["Entraron a la página", "", visitas]];
-  PREGUNTAS.forEach((q, i) => pasos.push([`Contestó ${i + 1}. ${q}`, "", ses.filter(s => s.paso >= i + 2).length]));
-  pasos.push(["Dejó sus datos", "nombre y WhatsApp", ses.filter(s => s.datos || s.paso >= 10).length]);
-  pasos.push(["Apartó su visita", "", ses.filter(s => s.visita).length]);
+  // Embudo del diagnóstico, con filtro por anuncio
+  const SIN_AN = "Sin anuncio";
+  const claveAn = s => s.anuncio || SIN_AN;
+  const anunciosPer = [...new Set(ses.map(claveAn))].sort((a, b) => (a === SIN_AN) - (b === SIN_AN) || a.localeCompare(b, "es", { numeric: true }));
+  if(embudoAnuncio !== "todos" && !anunciosPer.includes(embudoAnuncio)) embudoAnuncio = "todos";
+  const sesE = embudoAnuncio === "todos" ? ses : ses.filter(s => claveAn(s) === embudoAnuncio);
+  const visE = sesE.length;
+  const pasos = [["Entraron a la página", "", visE]];
+  PREGUNTAS.forEach((q, i) => pasos.push([`Contestó ${i + 1}. ${q}`, "", sesE.filter(s => s.paso >= i + 2).length]));
+  pasos.push(["Dejó sus datos", "nombre y WhatsApp", sesE.filter(s => s.datos || s.paso >= 10).length]);
+  pasos.push(["Apartó su visita", "", sesE.filter(s => s.visita).length]);
   let peor = -1, peorCaida = 0;
   for(let i = 1; i < pasos.length - 1; i++){ const c = pasos[i - 1][2] - pasos[i][2]; if(c > peorCaida){ peorCaida = c; peor = i; } }
-  h += `<div class="rejilla"><div class="tarjeta ancho"><h2>¿En qué parte se quedan?</h2><p class="ayuda">De cada 100 personas que entran, cuántas llegan a cada paso del diagnóstico.</p>`;
-  if(!visitas) h += vacio("Sin visitas en este periodo", "Cambia el periodo o espera a que lleguen visitas.");
+  h += `<div class="rejilla"><div class="tarjeta ancho"><h2>¿En qué parte se quedan?</h2><p class="ayuda">De cada 100 personas que entran, cuántas llegan a cada paso del diagnóstico. Elige un anuncio para ver solo a su gente.</p>`;
+  if(anunciosPer.length > 1) h += `<div class="chips" role="group" aria-label="Anuncio" style="margin-top:12px">${[["todos", "Todos", visitas]].concat(anunciosPer.map(a => [a, a, ses.filter(s => claveAn(s) === a).length])).map(([k, t, n]) =>
+    `<button class="chip" data-embudo="${esc(k)}" aria-pressed="${embudoAnuncio === k}">${esc(t)}<span class="n">${fmtNum(n)}</span></button>`).join("")}</div>`;
+  if(!visE) h += vacio("Sin visitas en este periodo", "Cambia el periodo o espera a que lleguen visitas.");
   else {
-    h += pasos.map(([n, s, v], i) => `<div class="barra-fila ${i === peor ? "alerta" : ""}"><span class="nom">${esc(n)}${s ? `<small>${s}</small>` : ""}</span><span class="barra"><i style="width:${pct(v, visitas)}%"></i></span><span class="v">${fmtNum(v)}</span><span class="p">${pct(v, visitas)}%</span></div>`).join("");
-    if(peor > 0) h += `<p class="etiqueta-alerta">Aquí se va más gente: <b>${pct(peorCaida, pasos[peor - 1][2])}%</b> no pasa de “${esc(pasos[peor][0].replace("Contestó ", ""))}”.</p>`;
+    h += pasos.map(([n, s, v], i) => `<div class="barra-fila ${i === peor ? "alerta" : ""}"><span class="nom">${esc(n)}${s ? `<small>${s}</small>` : ""}</span><span class="barra"><i style="width:${pct(v, visE)}%"></i></span><span class="v">${fmtNum(v)}</span><span class="p">${pct(v, visE)}%</span></div>`).join("");
+    if(peor > 0) h += `<p class="etiqueta-alerta">Aquí se va más gente${embudoAnuncio === "todos" ? "" : ` de ${esc(embudoAnuncio)}`}: <b>${pct(peorCaida, pasos[peor - 1][2])}%</b> no pasa de “${esc(pasos[peor][0].replace("Contestó ", ""))}”.</p>`;
+  }
+  // Comparativo rápido por anuncio
+  if(anunciosPer.length > 1){
+    const mitad = Math.ceil(PREGUNTAS.length / 2) + 1;
+    const filas = anunciosPer.map(a => { const g = ses.filter(s => claveAn(s) === a); return [a, g.length, g.filter(s => s.paso >= 2).length, g.filter(s => s.paso >= mitad).length, g.filter(s => s.paso >= PREGUNTAS.length + 1).length, g.filter(s => s.datos || s.paso >= 10).length, g.filter(s => s.visita).length]; });
+    h += `<h3 style="margin:22px 0 4px;font-size:15px;font-weight:600">Avance por anuncio</h3><p class="ayuda">Porcentaje de las visitas de cada anuncio que llega a cada punto.</p>
+      <div class="tabla-scroll"><table class="tabla"><thead><tr><th>Anuncio</th><th>Visitas</th><th>Contestó la 1</th><th>Llegó a la mitad</th><th>Terminó preguntas</th><th>Dejó datos</th><th>Apartó</th></tr></thead><tbody>${filas.map(([a, v, p1, pm, pt, d, ap]) =>
+      `<tr><td>${esc(a)}</td><td>${fmtNum(v)}</td><td>${pct(p1, v)}%</td><td>${pct(pm, v)}%</td><td>${pct(pt, v)}%</td><td>${pct(d, v)}%</td><td>${pct(ap, v)}%</td></tr>`).join("")}</tbody></table></div>`;
   }
   h += `</div>`;
 
