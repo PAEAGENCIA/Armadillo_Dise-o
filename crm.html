@@ -417,7 +417,8 @@ function normSesion(s){
   return {
     inicio: aFecha(s["Inicio"])?.getTime() || 0, paso: Number(s["Paso máximo"]) || 0,
     form: s["Llegó al formulario"] === "Sí", datos: s["Dejó datos"] === "Sí", visita: s["Apartó visita"] === "Sí",
-    wa: s["Abrió WhatsApp"] === "Sí", anuncio: s["Anuncio"] || "", campana: s["Campaña"] || "", dispositivo: s["Dispositivo"] || ""
+    wa: s["Abrió WhatsApp"] === "Sí", anuncio: s["Anuncio"] || "", campana: s["Campaña"] || "", dispositivo: s["Dispositivo"] || "",
+    info: Number(s["Info máxima"]) || 0, infoAntes: s["Vio info antes"] === "Sí", medInfo: s["Info máxima"] !== undefined && s["Info máxima"] !== ""
   };
 }
 const apartoVisita = l => l.estado === "Visita apartada";
@@ -633,6 +634,21 @@ function vistaMetricas(){
   else {
     h += pasos.map(([n, s, v], i) => `<div class="barra-fila ${i === peor ? "alerta" : ""}"><span class="nom">${esc(n)}${s ? `<small>${s}</small>` : ""}</span><span class="barra"><i style="width:${pct(v, visE)}%"></i></span><span class="v">${fmtNum(v)}</span><span class="p">${pct(v, visE)}%</span></div>`).join("");
     if(peor > 0) h += `<p class="etiqueta-alerta">Aquí se va más gente${embudoAnuncio === "todos" ? "" : ` de ${esc(embudoAnuncio)}`}: <b>${pct(peorCaida, pasos[peor - 1][2])}%</b> no pasa de “${esc(pasos[peor][0].replace("Contestó ", ""))}”.</p>`;
+  }
+  // ¿La información ayuda o distrae?
+  const conMed = sesE.filter(s => s.medInfo);
+  if(conMed.length >= 5){
+    const bajaron = conMed.filter(s => s.info > 0), noBajaron = conMed.filter(s => s.info === 0);
+    const antes = conMed.filter(s => s.infoAntes);
+    const leadsDe = g => g.filter(s => s.datos || s.paso >= 10).length;
+    h += `<h3 style="margin:22px 0 4px;font-size:15px;font-weight:600">¿La información de la página ayuda o distrae?</h3>
+      <p class="ayuda">Compara a quien bajó a ver proyectos, proceso o showroom contra quien no bajó. Cuenta desde que empezó esta medición (${fmtNum(conMed.length)} visitas).</p>
+      <div class="tabla-scroll"><table class="tabla"><thead><tr><th>Grupo</th><th>Visitas</th><th>Contestó la 1</th><th>Dejó datos</th></tr></thead><tbody>
+      <tr><td>Bajó a ver información</td><td>${fmtNum(bajaron.length)} <small>${pct(bajaron.length, conMed.length)}%</small></td><td>${pct(bajaron.filter(s => s.paso >= 2).length, bajaron.length)}%</td><td>${pct(leadsDe(bajaron), bajaron.length)}%</td></tr>
+      <tr><td>Bajó antes de contestar</td><td>${fmtNum(antes.length)} <small>${pct(antes.length, conMed.length)}%</small></td><td>${pct(antes.filter(s => s.paso >= 2).length, antes.length)}%</td><td>${pct(leadsDe(antes), antes.length)}%</td></tr>
+      <tr><td>No bajó</td><td>${fmtNum(noBajaron.length)} <small>${pct(noBajaron.length, conMed.length)}%</small></td><td>${pct(noBajaron.filter(s => s.paso >= 2).length, noBajaron.length)}%</td><td>${pct(leadsDe(noBajaron), noBajaron.length)}%</td></tr>
+      </tbody></table></div>
+      <p class="ayuda" style="margin-top:8px">Si quien baja deja datos más que quien no baja, la información ayuda. Si muchos bajan antes de contestar y casi ninguno contesta, distrae.</p>`;
   }
   // Comparativo rápido por anuncio
   if(anunciosPer.length > 1){

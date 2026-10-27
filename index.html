@@ -1036,6 +1036,21 @@ function enviar(d){
 }
 let pasoMax = 0;
 function avanzar(n){ if(n > pasoMax){ pasoMax = n; enviar({ evento: "progreso", paso: n }); } }
+/* Medición: hasta qué sección de información bajó la persona (1 proyectos ... 5 showroom) */
+let infoMax = 0;
+(() => {
+  const secs = [...document.querySelectorAll("main > section.sec")].slice(0, 5);
+  if(!secs.length || !("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver(entradas => {
+    entradas.forEach(en => {
+      if(!en.isIntersecting) return;
+      const nivel = secs.indexOf(en.target) + 1;
+      if(nivel > infoMax){ infoMax = nivel; enviar({ evento: "info", nivel, antes: pasoMax < 2 }); }
+      io.unobserve(en.target);
+    });
+  }, { threshold: 0, rootMargin: "0px 0px -40% 0px" });
+  secs.forEach(sx => io.observe(sx));
+})();
 function guardar(evento){
   const d = { evento, folio, fecha:new Date().toISOString(), nombre:contacto.nombre, telefono:contacto.tel,
     rango_estimado:rangoInterno(), prioridad:prioridad() };
