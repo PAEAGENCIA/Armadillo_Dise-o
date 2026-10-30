@@ -744,6 +744,22 @@ function msjCliente(l){
       : `${yo} Recibí tu diagnóstico de cocina${cocina ? " (" + cocina.trim() + ")" : ""}. Antes de proponerte algo, cuéntame: ¿qué es lo que más te gustaría cambiar de tu cocina?`;
   }
 }
+function turno(){
+  // Le toca a quien tiene menos leads activos; en empate, el primero de la lista.
+  return EQUIPO.map(p => [p, datos.leads.filter(x => activo(x) && x.responsable === p).length]).sort((a,b) => a[1] - b[1])[0][0];
+}
+function msjGrupo(l){
+  const quien = l.responsable || turno();
+  const ico = { Alta:"🔴", Media:"🟡", Baja:"⚪" }[l.prioridad] || "⚪";
+  const carga = EQUIPO.map(p => `${p === quien ? "👉" : "▫️"} ${p}: ${datos.leads.filter(x => activo(x) && (x.responsable === p || (x === l && p === quien))).length}`).join("\n");
+  return [`🪵 *NUEVO PROSPECTO · ${l.folio}*`, `${ico} Prioridad *${l.prioridad.toLowerCase()}*`, "",
+    `👤 *${l.nombre}*`, `📍 ${l.zona || "Sin zona"}${l.ubic ? " · " + l.ubic : ""}`,
+    `🍳 ${[l.forma, l.acabado].filter(Boolean).join(" · ")}`, `💰 ${l.inversion || "—"} · ⏱️ ${l.tiempo || "—"}`,
+    apartoVisita(l) ? `📅 Apartó visita: ${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""}` : "", "",
+    `✅ *LE TOCA A: ${quien.toUpperCase()}*`, `Escríbele: https://wa.me/52${l.tel}`, "",
+    `📊 *Turnos (leads activos)*`, carga, "",
+    `Responde a este mensaje con:`, `✋ cuando lo tomes · 📞 cuando lo contactes · 📅 cuando quede la visita`].filter((x, i, a) => x !== "" || a[i - 1] !== "").join("\n");
+}
 function fichaTexto(l){
   return [`Lead Armadillo · ${l.nombre} (prioridad ${l.prioridad})`, `WhatsApp: ${l.tel}`,
     [l.forma, l.acabado, l.inversion, l.tiempo, l.zona].filter(Boolean).join(" · "),
@@ -764,7 +780,7 @@ function pintarFicha(){
   h += `<div class="acciones">
     <a class="accion" id="a-wa" href="https://wa.me/52${esc(l.tel)}?text=${encodeURIComponent(msjCliente(l))}" target="_blank" rel="noopener">${I.wa}WhatsApp</a>
     <a class="accion" id="a-tel" href="tel:+52${esc(l.tel)}">${I.tel}Llamar</a>
-    <a class="accion" href="https://wa.me/?text=${encodeURIComponent(fichaTexto(l))}" target="_blank" rel="noopener">${I.enviar}Al grupo</a></div>
+    <a class="accion" id="a-grupo" href="https://wa.me/?text=${encodeURIComponent(msjGrupo(l))}" target="_blank" rel="noopener">${I.enviar}Al grupo</a></div>
     ${l.escribio ? `<p class="aviso-wa">${I.ok}<span>Este lead tocó el botón de WhatsApp en la landing, así que el chat con Daniel se abrió con su diagnóstico ya escrito. No hace falta reenviárselo. Lo único que no podemos saber es si de verdad mandó el mensaje.</span></p>` : ""}`;
   if(apartoVisita(l) || l.visitaDia){
     h += `<p class="seccion-t">Visita técnica</p><div class="caja"><div class="visita-caja">
@@ -772,7 +788,7 @@ function pintarFicha(){
       <span class="txt"><b>${esc(l.visitaDia || "Sin fecha")}</b><span>${esc(l.visitaHora || "")}${l.ubic ? " · " + esc(l.ubic) : ""}</span></span>
       ${l.seguimiento === "Nuevo" || l.seguimiento === "Contactado" ? `<button class="btn chico" id="confirmar-visita">Confirmar</button>` : ""}</div></div>`;
   }
-  const sugerido = EQUIPO.map(p => [p, datos.leads.filter(x => activo(x) && x.responsable === p).length]).sort((a,b) => a[1] - b[1])[0][0];
+  const sugerido = turno();
   h += `<p class="seccion-t">Responsable</p><div class="caja"><div class="etapas" role="group" aria-label="Responsable">${EQUIPO.map(p =>
     `<button data-resp="${p}" aria-pressed="${l.responsable === p}">${p}</button>`).join("")}</div>
     ${l.responsable ? "" : `<div class="dato"><span>Le toca a</span><b>${sugerido}</b></div>`}</div>`;
@@ -795,6 +811,7 @@ function pintarFicha(){
 
   const contacto = tipo => { const c = { contacto: tipo }; if(l.seguimiento === "Nuevo") c.seguimiento = "Contactado"; guardar(l.folio, c); };
   $("a-wa").onclick = () => contacto("WhatsApp enviado");
+  $("a-grupo").onclick = () => { if(!l.responsable) guardar(l.folio, { responsable: turno() }, "Asignado a " + turno()); };
   $("a-tel").onclick = () => contacto("Llamada");
   const cv = $("confirmar-visita"); if(cv) cv.onclick = () => guardar(l.folio, { seguimiento: "Visita agendada", contacto: "Visita confirmada" }, "Visita confirmada");
   document.querySelectorAll("[data-resp]").forEach(b => b.onclick = () => { const r = b.dataset.resp === l.responsable ? "" : b.dataset.resp; guardar(l.folio, { responsable: r }, r ? "Asignado a " + r : "Sin responsable"); });
