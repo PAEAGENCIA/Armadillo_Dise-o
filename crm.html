@@ -113,6 +113,7 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .pill.e-Nuevo{background:color-mix(in srgb,var(--blue) 14%,transparent);color:var(--blue)}
 .pill.e-Contactado{background:color-mix(in srgb,var(--indigo) 14%,transparent);color:var(--indigo)}
 .pill.e-Visita-agendada{background:color-mix(in srgb,var(--orange) 16%,transparent);color:color-mix(in srgb,var(--orange) 80%,var(--text))}
+.pill.e-Visita-pagada{background:color-mix(in srgb,var(--green,#30a46c) 16%,transparent);color:color-mix(in srgb,var(--green,#30a46c) 80%,var(--text))}
 .pill.e-Visita-realizada{background:color-mix(in srgb,var(--teal) 16%,transparent);color:color-mix(in srgb,var(--teal) 75%,var(--text))}
 .pill.e-Propuesta-enviada{background:color-mix(in srgb,var(--purple) 14%,transparent);color:var(--purple)}
 .pill.e-Ganado{background:color-mix(in srgb,var(--green) 16%,transparent);color:color-mix(in srgb,var(--green) 75%,var(--text))}
@@ -330,7 +331,7 @@ details.hist .notas p{font-size:13px;color:var(--text2)}
 /* ============ CONFIGURACIÓN ============ */
 const API = "https://script.google.com/macros/s/AKfycbxaxYx2Esw2nu3v2PPYmvPWl3ipeXG1lczlPagHxst3H0MCP9V8NTSFjdcW4AZm1ksF/exec";
 const WHATSAPP_DANIEL = "522221367108";
-const ETAPAS = ["Nuevo", "Contactado", "Visita agendada", "Visita realizada", "Propuesta enviada", "Ganado", "Perdido"];
+const ETAPAS = ["Nuevo", "Contactado", "Visita agendada", "Visita pagada", "Visita realizada", "Propuesta enviada", "Ganado", "Perdido"];
 const PREGUNTAS = ["Etapa", "Uso", "Distribución", "Muro", "Acabados", "Inversión", "Tiempo", "Zona"];
 /* ======================================= */
 
@@ -405,7 +406,7 @@ function normLead(l){
     etapa: l["Etapa"] || "", uso: l["Uso"] || "", forma: l["Distribución"] || "", tamano: l["Muro principal"] || "",
     acabado: l["Acabados"] || "", inversion: l["Inversión"] || "", tiempo: l["Tiempo"] || "", zona: l["Zona"] || "",
     visitaDia: l["Visita día"] || "", visitaHora: l["Visita horario"] || "", visitaFecha: aFecha(l["Visita fecha"]),
-    escribio: l["Escribió por WhatsApp"] === "Sí", rango, rangoMedio: rango.length === 2 ? (rango[0] + rango[1]) / 2 : 0,
+    escribio: l["Escribió por WhatsApp"] === "Sí", pago: l["Abrió pago"] === "Sí", rango, rangoMedio: rango.length === 2 ? (rango[0] + rango[1]) / 2 : 0,
     campana: l["Campaña"] || "", anuncio: l["Anuncio"] || "", monto: Number(l["Monto cerrado"]) || 0,
     notas: String(l["Notas"] || ""), historial: String(l["Historial"] || ""),
     seguimiento: ETAPAS.includes(l["Seguimiento"]) ? l["Seguimiento"] : "Nuevo",
@@ -417,9 +418,14 @@ function normSesion(s){
   return {
     inicio: aFecha(s["Inicio"])?.getTime() || 0, paso: Number(s["Paso máximo"]) || 0,
     form: s["Llegó al formulario"] === "Sí", datos: s["Dejó datos"] === "Sí", visita: s["Apartó visita"] === "Sí",
-    wa: s["Abrió WhatsApp"] === "Sí", anuncio: s["Anuncio"] || "", campana: s["Campaña"] || "", dispositivo: s["Dispositivo"] || "",
+    wa: s["Abrió WhatsApp"] === "Sí", folio: String(s["Folio"] || ""), anuncio: s["Anuncio"] || "", campana: s["Campaña"] || "", dispositivo: s["Dispositivo"] || "",
     info: Number(s["Info máxima"]) || 0, infoAntes: s["Vio info antes"] === "Sí", medInfo: s["Info máxima"] !== undefined && s["Info máxima"] !== ""
   };
+}
+/* Sesiones de prueba: dejaron datos pero su lead ya no existe (se borró del Sheet). No cuentan en métricas. */
+function limpiarSesiones(ses, leads){
+  const folios = new Set(leads.map(l => l.folio));
+  return ses.filter(x => !(x.folio && (x.datos || x.visita) && !folios.has(x.folio)));
 }
 const apartoVisita = l => l.estado === "Visita apartada";
 const activo = l => l.seguimiento !== "Ganado" && l.seguimiento !== "Perdido";
@@ -440,7 +446,7 @@ async function sincronizar(manual){
     const r = await api({ accion: "datos" });
     if(!r.ok){ if(r.error === "clave"){ salir("La clave no es correcta."); return; } throw new Error(r.error); }
     datos.leads = r.leads.map(normLead).sort((a,b) => b.fecha - a.fecha);
-    datos.sesiones = r.sesiones.map(normSesion);
+    datos.sesiones = limpiarSesiones(r.sesiones.map(normSesion), datos.leads);
     ultimaSync = Date.now();
     render();
     if(manual) toast("Datos actualizados");
@@ -563,7 +569,7 @@ const FILTROS = [
   ["visita", "Apartó visita", apartoVisita],
   ["escribio", "Ya escribió a Daniel", l => l.escribio],
   ["alta", "Prioridad alta", l => l.prioridad === "Alta"],
-  ["proceso", "En proceso", l => ["Contactado","Visita agendada","Visita realizada","Propuesta enviada"].includes(l.seguimiento)],
+  ["proceso", "En proceso", l => ["Contactado","Visita agendada","Visita pagada","Visita realizada","Propuesta enviada"].includes(l.seguimiento)],
   ["ganados", "Ganados", l => l.seguimiento === "Ganado"],
   ["perdidos", "Perdidos", l => l.seguimiento === "Perdido"]
 ];
@@ -723,10 +729,18 @@ $("velo").onclick = cerrarFicha;
 document.addEventListener("keydown", e => { if(e.key === "Escape" && fichaFolio) cerrarFicha(); });
 
 function msjCliente(l){
-  const n = primerNombre(l.nombre);
-  return apartoVisita(l) && ["Nuevo","Contactado"].includes(l.seguimiento)
-    ? `Hola ${n}, soy el Ing. Daniel García de Armadillo Diseño. Vi que apartaste tu visita técnica para el ${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""}. ¿Me compartes la dirección para dejarla confirmada?`
-    : `Hola ${n}, soy el Ing. Daniel García de Armadillo Diseño. Recibí tu diagnóstico de cocina${l.forma ? " (" + l.forma.toLowerCase() + (l.zona ? ", " + l.zona : "") + ")" : ""}. ¿Te parece si agendamos la visita técnica para medir tu espacio?`;
+  const n = primerNombre(l.nombre), yo = `Hola ${n}, soy el Ing. Daniel García de Armadillo Diseño.`;
+  const cocina = l.forma ? " " + l.forma.toLowerCase().replace(/^cocina /, "") : "";
+  switch(l.seguimiento){
+    case "Visita agendada": return `${yo} Te escribo para confirmar tu visita técnica${l.visitaDia ? " del " + l.visitaDia : ""}. La visita tiene un costo de $1,000 que se abona completo a tu cocina, y si no avanzamos el render es tuyo. Puedes pagarla por transferencia, en efectivo o con tarjeta. ¿Cómo te acomoda y me confirmas la dirección?`;
+    case "Visita pagada": return `${yo} Ya quedó registrado tu pago, gracias. Nos vemos en tu visita${l.visitaDia ? " el " + l.visitaDia : ""}. Si tienes fotos de tu cocina actual o planos, mándamelos y llego con ideas.`;
+    case "Visita realizada": return `${yo} Gracias por recibirnos. Ya estamos trabajando en el render de tu cocina. ¿Hay algo que se te haya ocurrido después de la visita y quieras que tomemos en cuenta?`;
+    case "Propuesta enviada": return `${yo} ¿Qué te pareció el render de tu cocina? Si hay algo que quieras ajustar, lo platicamos y lo dejamos como te imaginas.`;
+    case "Contactado": return `${yo} Te escribo para dar seguimiento a tu cocina. ¿Pudiste pensar lo que platicamos? Esta semana tengo espacio para ir a medir.`;
+    default: return apartoVisita(l)
+      ? `${yo} Vi que apartaste tu visita técnica para el ${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""}. ¿Me compartes la dirección para dejarla confirmada?`
+      : `${yo} Recibí tu diagnóstico de cocina${cocina ? " (" + cocina.trim() + ")" : ""}. Antes de proponerte algo, cuéntame: ¿qué es lo que más te gustaría cambiar de tu cocina?`;
+  }
 }
 function fichaTexto(l){
   return [`Lead Armadillo · ${l.nombre} (prioridad ${l.prioridad})`, `WhatsApp: ${l.tel}`,
@@ -743,7 +757,7 @@ function pintarFicha(){
   const vf = l.visitaFecha;
   let h = `<div class="persona"><span class="avatar ${esc(l.prioridad)}">${esc(iniciales(l.nombre))}</span>
     <h2 id="ficha-nombre">${esc(l.nombre)}</h2><p>Folio ${esc(l.folio)} · llegó ${hace(l.fecha)}</p>
-    <div class="pills"><span class="pill ${claseEtapa(l.seguimiento)}">${esc(l.seguimiento)}</span><span class="pill" style="background:var(--fill2)"><span class="punto ${esc(l.prioridad)}"></span>Prioridad ${esc(l.prioridad.toLowerCase())}</span>${l.escribio ? `<span class="pill wa">${I.wa}Ya le escribió a Daniel</span>` : ""}</div></div>`;
+    <div class="pills"><span class="pill ${claseEtapa(l.seguimiento)}">${esc(l.seguimiento)}</span><span class="pill" style="background:var(--fill2)"><span class="punto ${esc(l.prioridad)}"></span>Prioridad ${esc(l.prioridad.toLowerCase())}</span>${l.escribio ? `<span class="pill wa">${I.wa}Ya le escribió a Daniel</span>` : ""}${l.pago ? `<span class="pill e-Visita-pagada">Abrió el link de pago</span>` : ""}</div></div>`;
   h += `<div class="acciones">
     <a class="accion" id="a-wa" href="https://wa.me/52${esc(l.tel)}?text=${encodeURIComponent(msjCliente(l))}" target="_blank" rel="noopener">${I.wa}WhatsApp</a>
     <a class="accion" id="a-tel" href="tel:+52${esc(l.tel)}">${I.tel}Llamar</a>
@@ -810,7 +824,7 @@ $("form-login").onsubmit = async e => {
     if(!r.ok){ $("error-login").textContent = r.error === "clave" ? "La clave no es correcta." : "No pudimos entrar. Inténtalo de nuevo."; clave = ""; return; }
     store.set("ad_crm_clave", v);
     datos.leads = r.leads.map(normLead).sort((a,b) => b.fecha - a.fecha);
-    datos.sesiones = r.sesiones.map(normSesion);
+    datos.sesiones = limpiarSesiones(r.sesiones.map(normSesion), datos.leads);
     ultimaSync = Date.now();
     $("login").classList.add("oculto"); $("app").classList.remove("oculto");
     render(); actualizarSync();

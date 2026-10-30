@@ -402,6 +402,12 @@ dialog::backdrop{background:rgba(5,10,10,.7)}
   .desde-anuncio .hero{padding-top:2px}
   .desde-anuncio .escenario{margin-top:14px}
 }
+.sr-ctas{margin-top:auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sr-ctas .btn-linea{margin-top:0}
+.sr-nota{margin-top:12px!important;font-size:14px!important}
+.res-ctas{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ok-ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+@media(max-width:820px){.res-ctas{width:100%}.res-ctas .btn{width:100%;justify-content:space-between}}
 </style>
 <script>try{if(/[?&](utm_source|fbclid)=/.test(location.search))document.documentElement.classList.add("desde-anuncio")}catch(e){}</script>
 </head>
@@ -437,6 +443,8 @@ dialog::backdrop{background:rgba(5,10,10,.7)}
       <span><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Planta propia en Puebla</span>
       <span><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Render 3D antes de fabricar</span>
       <span><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Visita técnica de $1,000, abonable</span>
+      <span><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Cocinas desde $200,000</span>
+      <span><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>+75 proyectos de carpintería entregados</span>
     </div>
 
     <div class="escenario" id="diagnostico">
@@ -487,9 +495,20 @@ dialog::backdrop{background:rgba(5,10,10,.7)}
     <div class="galeria">
       <figure class="g1"><img loading="lazy" decoding="async" src="img/cocina-isla.webp" alt="Cocina con isla y plafón de listones de madera"><figcaption>Cocina con isla</figcaption></figure>
       <figure class="g2"><img loading="lazy" decoding="async" src="img/lambrin.webp" alt="Lambrín de madera con iluminación"><figcaption>Lambrín a la medida</figcaption></figure>
-      <figure><img loading="lazy" decoding="async" src="img/barra.webp" alt="Barra de madera con lámparas colgantes"><figcaption>Barra y plafón</figcaption></figure>
+      <figure><img loading="lazy" decoding="async" src="img/cocina-cascada.webp" alt="Isla de cocina con cubierta de piedra en cascada hasta el piso"><figcaption>Cubierta en cascada</figcaption></figure>
       <figure><img loading="lazy" decoding="async" src="img/repisas.webp" alt="Repisas de madera con luz integrada"><figcaption>Repisas con luz</figcaption></figure>
     </div>
+  </div>
+</section>
+
+<section class="sec" id="prueba" hidden>
+  <div class="cont">
+    <div class="cab">
+      <span class="eti">Clientes</span>
+      <h2>Lo que dicen quienes ya tienen su cocina</h2>
+    </div>
+    <div class="ventajas" id="prueba-datos"></div>
+    <div class="ventajas" id="prueba-testimonios" style="margin-top:12px"></div>
   </div>
 </section>
 
@@ -534,10 +553,15 @@ dialog::backdrop{background:rgba(5,10,10,.7)}
     <ol class="proceso">
       <li><h3>Diagnóstico</h3><p>Dos minutos para entender tu proyecto.</p></li>
       <li class="dest"><h3>Visita técnica</h3><p>Medimos y revisamos instalaciones. $1,000, abonables.</p></li>
-      <li><h3>Proyecto y render</h3><p>Tu cocina en 3D con presupuesto, en unas dos semanas.</p></li>
+      <li><h3>Proyecto y render</h3><p>Tu cocina en 3D con presupuesto, en unas dos semanas. Nuestras cocinas integrales parten de $200,000.</p></li>
       <li><h3>Fabricación</h3><p>En nuestra planta propia en Puebla, en unas 6 semanas.</p></li>
       <li><h3>Instalación y entrega</h3><p>Cuando todo abre, cierra y funciona como se diseñó. Con 12 meses de garantía.</p></li>
     </ol>
+    <div class="ventajas" style="margin-top:12px">
+      <div class="ventaja"><h3>Pagas por etapas</h3><p>Un anticipo cuando apruebas tu render y el resto cuando entregamos tu cocina. Nunca pagas todo por adelantado.</p></div>
+      <div class="ventaja"><h3>12 meses de garantía</h3><p>Cubre herrajes, materiales y fabricación. No cubre golpes, quemaduras ni daños por mascotas o mal uso.</p></div>
+      <div class="ventaja"><h3>Tu render es tuyo</h3><p>Si pagas la visita y decides no avanzar, te quedas con el render de tu proyecto. Pagas por transferencia, efectivo o tarjeta.</p></div>
+    </div>
   </div>
 </section>
 
@@ -548,7 +572,9 @@ dialog::backdrop{background:rgba(5,10,10,.7)}
       <span class="eti" style="align-self:flex-start">Showroom</span>
       <h2>Ven a ver y tocar los materiales</h2>
       <p>Te mostramos acabados, herrajes y proyectos en persona, y platicamos de tu cocina sin prisa.</p>
-      <a class="btn-linea" href="https://maps.app.goo.gl/8gG1xvHt7NSWsRBt9" target="_blank" rel="noopener">Cómo llegar</a>
+      <div class="sr-ctas"><a class="btn" id="sr-wa" href="#" target="_blank" rel="noopener">Agendar visita al showroom <span class="flecha"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      <a class="btn-linea" href="https://maps.app.goo.gl/8gG1xvHt7NSWsRBt9" target="_blank" rel="noopener">Cómo llegar</a></div>
+      <p class="sr-nota">Sin costo, con cita, de lunes a viernes de 9:00 a 6:00. Ideal si todavía estás comparando opciones.</p>
     </div>
   </div>
   <div class="cont">
@@ -595,11 +621,15 @@ const CONFIG = {
   sheetEndpoint: "https://script.google.com/macros/s/AKfycbxaxYx2Esw2nu3v2PPYmvPWl3ipeXG1lczlPagHxst3H0MCP9V8NTSFjdcW4AZm1ksF/exec",                  // URL de Google Apps Script que guarda cada lead en el CRM. NECESARIO para no perder contactos.
   instagram: "https://www.instagram.com/armadillo.proyecto/",
   // Rangos internos (NO se muestran al cliente; llegan al CRM). Muro de 3 a 5 m. CONFIRMAR CON DANIEL.
-  rangos: { funcional:[150000,200000], diseno:[200000,280000], alta:[280000,400000] },
+  rangos: { funcional:[200000,250000], diseno:[250000,330000], alta:[330000,450000] },
   factorTamano: { chico:0.8, medio:1, grande:1.3, muy:1.6, nose:1 },
   // Regalo por agendar desde el diagnóstico. CONFIRMAR CON DANIEL que lo puede cumplir.
   respuesta: "en menos de 24 horas",          // Promesa de tiempo de respuesta tras apartar.
-  regalo: { titulo:"Muestrario de materiales en tu casa", texto:"Llevamos muestras de maderas, cubiertas y herrajes para que elijas tocándolos, sin ir al showroom." }
+  pagoVisita: "",                     // Link de pago de la visita de $1,000 (Mercado Pago, Clip, etc.). Vacío = no se muestra el botón de pago.
+  // Prueba social: llenar SOLO con datos reales. Vacío = la sección no se muestra.
+  prueba: { cocinas:"", anios:"", calificacion:"" },  // ej. cocinas:"+40", anios:"8", calificacion:"4.9 en Google"
+  testimonios: [],                    // ej. { texto:"Cumplieron en tiempo y dejaron todo limpio.", nombre:"Laura M.", zona:"Lomas de Angelópolis" }
+  regalo: null                        // Regalo al apartar la visita: null = no se muestra. Daniel aún lo define. Formato: { titulo:"...", texto:"..." }
 };
 /* ================================================================= */
 
@@ -610,7 +640,7 @@ if(CONFIG.pixelId){
 }
 let iniciado = false;
 
-const FOTO_PERFIL = "img/barra.webp";
+const FOTO_PERFIL = "img/cocina-cascada.webp";
 const I = {
   etapa:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   uso:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.5a3 3 0 0 1 0 6M21 20c0-2.6-1.6-4.8-4-5.6"/>',
@@ -667,7 +697,8 @@ const preguntas = [
       {v:"diseno", t:"Diseño y materiales seleccionados", s:"Más detalle y mejores herrajes"},
       {v:"alta", t:"Alta gama, sin concesiones", s:"Lo mejor en materiales y herrajes"} ], acuse:"Anotado." },
   { id:"presupuesto", campo:"Inversión", q:"Para proponerte materiales que encajen contigo, ¿qué inversión tienes contemplada?", ayuda:"Es solo una referencia. Nos ayuda a no proponerte algo fuera de lo que buscas.", op:[
-      {v:"150a250", t:"$150,000 a $250,000", a:"Perfecto. Es un rango donde se logran cocinas muy bien resueltas."},
+      {v:"hasta200", t:"Menos de $200,000", a:"Gracias por decirlo. Te contamos con honestidad qué se puede hacer bien con ese presupuesto."},
+      {v:"200a250", t:"$200,000 a $250,000", a:"Perfecto. Es un rango donde se logran cocinas muy bien resueltas."},
       {v:"250a400", t:"$250,000 a $400,000", a:"Excelente. Con ese rango ya se eligen materiales y herrajes de mejor nivel."},
       {v:"mas400", t:"Más de $400,000", a:"Excelente. Hay espacio para materiales de alta gama y piezas especiales."},
       {v:"orientar", t:"Prefiero que me orienten", s:"Quiero ver opciones primero", a:"Claro. En la visita te mostramos opciones en distintos niveles."} ]},
@@ -862,13 +893,13 @@ function resultado(){
   const primer = esc(contacto.nombre.split(" ")[0]);
   const sinPrisa = R.tiempo === "explorar" || R.etapa === "ideas";
   const lejos = R.zona === "Fuera de Puebla";
-  const bajo = R.presupuesto === "hasta150";
+  const bajo = R.presupuesto === "hasta200";
   const dec = (decisiones[R.acabado] || decisiones.diseno).map(([t,d]) => t === "Cubierta" && R.uso === "diario" ? [t, d + " Con uso diario, la resistencia va primero."] : [t,d]);
 
   let paso;
   if(bajo){
     paso = `<div><h3>${svg("tiempo")}Tu siguiente paso</h3>
-      <p><b style="font-weight:500">Nuestras cocinas integrales parten de $150,000.</b> Si tu inversión es menor, escríbenos: te decimos con honestidad qué sí se puede hacer bien con ese presupuesto y qué conviene dejar para una segunda etapa.</p></div>
+      <p><b style="font-weight:500">Nuestras cocinas integrales parten de $200,000.</b> Si tu inversión es menor, escríbenos: te decimos con honestidad qué sí se puede hacer bien con ese presupuesto y qué conviene dejar para una segunda etapa.</p></div>
       <a class="btn" id="wa" href="${linkWA("Me gustaría platicar mi caso.")}" target="_blank" rel="noopener">Platicar mi caso <span class="flecha">${svg("flecha")}</span></a>`;
   } else {
     paso = "";
@@ -877,11 +908,11 @@ function resultado(){
   if(!visita.dia){ visita.dia = prop.iso; visita.diaL = prop.largo; visita.hora = HORARIOS[0].l; }
   const agendaHTML = `
         <div class="w agenda" id="agenda">
-          ${bajo ? `<div class="aviso-bajo">${svg("info")}<p><b>Nuestras cocinas integrales parten de $150,000.</b> Si tu presupuesto es menor, en la visita te decimos con honestidad qué se puede hacer bien con él, o cómo hacer tu cocina por etapas.</p></div>` : ""}
+          ${bajo ? `<div class="aviso-bajo">${svg("info")}<p><b>Nuestras cocinas integrales parten de $200,000.</b> Si tu presupuesto es menor, en la visita te decimos con honestidad qué se puede hacer bien con él, o cómo hacer tu cocina por etapas.</p></div>` : ""}
           <div class="ag-cab">
             <div><h3>${svg("tiempo")}Tu siguiente paso: la visita técnica a tu casa</h3>
               <p class="ag-tit">Te proponemos este horario</p></div>
-            <span class="regalo-pill">${svg("regalo")}Regalo al apartar</span>
+            ${CONFIG.regalo ? `<span class="regalo-pill">${svg("regalo")}Regalo al apartar</span>` : ""}
           </div>
           <button type="button" class="propuesta" id="propuesta" aria-pressed="true">
             <span class="cal"><small id="p-dia">${prop.dia}</small><b id="p-num">${prop.num}</b></span>
@@ -897,20 +928,22 @@ function resultado(){
             <div class="pv-monto"><b>$1,000</b><span>se abonan al 100% a tu cocina si contratas</span></div>
             <ul><li>${svg("check")}Medidas en tu casa</li><li>${svg("check")}Revisión de instalaciones</li><li>${svg("check")}Ficha técnica</li><li>${svg("check")}Render 3D de tu cocina</li></ul>
           </div>
-          <div class="regalo">
+          ${CONFIG.regalo ? `<div class="regalo">
             <span class="ico-reg">${svg("regalo")}</span>
             <div><b>${CONFIG.regalo.titulo}</b><span>${CONFIG.regalo.texto}</span></div>
-          </div>
+          </div>` : ""}
           <div class="ag-pie">
-            <p><b>¿Por qué tiene costo?</b> Porque vamos a tu casa a medir de verdad y te entregamos un proyecto con render, no una cotización al aire. Por eso se abona completo cuando contratas.</p>
+            <p><b>¿Por qué tiene costo?</b> Porque vamos a tu casa a medir de verdad y te entregamos un proyecto con render, no una cotización al aire. Por eso se abona completo cuando contratas, y si decides no avanzar, el render es tuyo.</p>
             <button type="button" class="btn" id="apartar">Apartar mi visita <span class="flecha">${svg("flecha")}</span></button>
           </div>
-          ${bajo ? `<p class="alt-wa"><a id="platicar" href="${linkWA("Antes de agendar, me gustaría platicar mi caso.")}" target="_blank" rel="noopener">Prefiero platicar mi caso por WhatsApp primero</a></p>` : ""}
+          <p class="alt-wa"><a id="platicar" href="${linkWA("Antes de agendar, me gustaría platicar mi caso.")}" target="_blank" rel="noopener">Prefiero platicar mi caso por WhatsApp primero</a><br>
+            <a id="showroom-alt" href="${linkWA("Antes de la visita a mi casa, me gustaría conocer el showroom.")}" target="_blank" rel="noopener">O conoce primero el showroom, sin costo</a></p>
         </div>`;
   zona.innerHTML = `<div class="anim">
       <div class="res-cab"><div><h2 class="q" tabindex="-1">${primer}, este es tu diagnóstico</h2>
       <p class="q-ayuda">Lo preparamos con tus respuestas y con lo que hemos aprendido en cada cocina que fabricamos.</p></div>
-      <a class="btn-osc" href="#agenda">${svg("tiempo")}Agendar visita</a></div>
+      <div class="res-ctas"><a class="btn" id="wa-diag" href="${linkWA("Quiero recibir mi diagnóstico por aquí y resolver unas dudas antes de agendar mi visita.")}" target="_blank" rel="noopener">Recibir mi diagnóstico por WhatsApp <span class="flecha">${svg("flecha")}</span></a>
+      <a class="btn-osc" href="#agenda">${svg("tiempo")}Agendar visita</a></div></div>
       <div class="res-grid">
         <div class="w perfil"><img loading="lazy" decoding="async" src="${FOTO_PERFIL}" alt="Cocina con lámparas colgantes y madera, proyecto de Armadillo">
           <div><h3>${svg("forma")}Perfil de tu proyecto</h3><strong>${titulo[R.forma] || titulo.nose} ${enfoque[R.uso] || ""}</strong></div></div>
@@ -939,8 +972,7 @@ function resultado(){
       <p class="res-nota">${sinPrisa ? `¿Todavía explorando? <a href="${CONFIG.instagram}" target="_blank" rel="noopener">Mira nuestros proyectos en Instagram</a>. ` : ""}Folio ${folio}.${lejos ? " Para casas fuera de Puebla confirmamos cobertura por mensaje." : ""}</p></div>`;
   lateral(); actualizarFlotante();
   conectarAgenda();
-  const alt = $("platicar");
-  if(alt) alt.onclick = () => { guardar("clic_whatsapp"); if(typeof window.fbq === "function") window.fbq("track","Contact"); };
+  ["platicar","showroom-alt","wa-diag"].forEach(id => { const a = $(id); if(a) a.onclick = () => { guardar("clic_whatsapp"); if(typeof window.fbq === "function") window.fbq("track","Contact"); }; });
 }
 
 const HORARIOS = [{l:"por la mañana (10 a 12)", t:"Mañana", r:"10 a 12"},{l:"a mediodía (12 a 3)", t:"Mediodía", r:"12 a 3"},{l:"por la tarde (3 a 5)", t:"Tarde", r:"3 a 5"}];
@@ -981,18 +1013,20 @@ function conectarAgenda(){
           <h3 class="ok-tit">${conCRM ? `Listo, ${nombre}. Tu visita quedó apartada` : `Casi listo, ${nombre}. Confirma tu visita`}</h3>
           <p class="ok-fecha">${esc(cap(visita.diaL))}, ${esc(visita.hora)}</p>
           <p>${conCRM ? `Te escribimos por WhatsApp ${CONFIG.respuesta} para confirmar tu dirección. La visita cuesta $1,000 y se abona completa a tu cocina.` : `Mándanos el mensaje por WhatsApp para dejarla confirmada. Ya va escrito con tu diagnóstico. La visita cuesta $1,000 y se abona completa a tu cocina.`}</p>
-          <div class="regalo mini"><span class="ico-reg">${svg("regalo")}</span><div><b>${CONFIG.regalo.titulo}</b><span>Incluido en tu visita.</span></div></div>
-          ${conCRM
-            ? `<a class="enlace-wa" id="wa" href="${linkWA(msg)}" target="_blank" rel="noopener">¿Prefieres escribirnos ahora? Abrir WhatsApp</a>`
-            : `<a class="btn" id="wa" href="${linkWA(msg)}" target="_blank" rel="noopener">Confirmar por WhatsApp <span class="flecha">${svg("flecha")}</span></a>`}
+          ${CONFIG.regalo ? `<div class="regalo mini"><span class="ico-reg">${svg("regalo")}</span><div><b>${CONFIG.regalo.titulo}</b><span>Incluido en tu visita.</span></div></div>` : ""}
+          <div class="ok-ctas">
+            ${CONFIG.pagoVisita ? `<a class="btn" id="pagar" href="${CONFIG.pagoVisita}" target="_blank" rel="noopener">Pagar mi visita ($1,000) <span class="flecha">${svg("flecha")}</span></a>` : ""}
+            <a class="${CONFIG.pagoVisita ? "btn-osc" : "btn"}" id="wa" href="${linkWA(msg)}" target="_blank" rel="noopener">Confirmar ahora por WhatsApp ${CONFIG.pagoVisita ? "" : `<span class="flecha">${svg("flecha")}</span>`}</a>
+          </div>
         </div>
       </div>`;
     $("wa").onclick = () => { guardar("clic_whatsapp"); if(typeof window.fbq === "function") window.fbq("track","Contact"); };
+    const pg = $("pagar"); if(pg) pg.onclick = () => { guardar("clic_pago"); if(typeof window.fbq === "function") window.fbq("track","InitiateCheckout",{value:1000,currency:"MXN"}); };
   };
 }
 
 function prioridad(){
-  const p = {hasta150:0, "150a250":2, "250a400":3, mas400:3, orientar:2}[R.presupuesto] || 0;
+  const p = {hasta200:0, "200a250":2, "250a400":3, mas400:3, orientar:2}[R.presupuesto] || 0;
   const t = {ya:3, "1a3":2, "3a6":1, explorar:0}[R.tiempo] || 0;
   const e = {nueva:2, renovar:2, obra:2, ideas:0}[R.etapa] || 0;
   const z = R.zona === "Fuera de Puebla" ? 0 : 1;
@@ -1011,6 +1045,18 @@ function linkWA(final){
   const msg = `Hola, soy ${contacto.nombre}. Hice el diagnóstico de cocina (folio ${folio}):\n${lineas.join("\n")}\n\n${final || "Me interesa agendar mi visita técnica."}`;
   return `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
 }
+/* ===== Showroom y prueba social ===== */
+(() => {
+  const sr = $("sr-wa");
+  if(sr){ sr.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Hola, quiero agendar una cita para visitar el showroom de Armadillo y platicar de mi cocina. ¿Qué día tienen disponible entre semana?")}`;
+    sr.onclick = () => { enviar({ evento: "info", nivel: 6 }); if(typeof window.fbq === "function") window.fbq("track","Contact"); }; }
+  const P = CONFIG.prueba || {}, T = CONFIG.testimonios || [];
+  const datosP = [[P.cocinas, "cocinas entregadas"], [P.anios, "años fabricando"], [P.calificacion, "calificación de clientes"]].filter(x => x[0]);
+  if(!datosP.length && !T.length) return;
+  $("prueba").hidden = false;
+  $("prueba-datos").innerHTML = datosP.map(([v,t]) => `<div class="ventaja"><h3 style="font-size:34px">${esc(v)}</h3><p>${esc(t)}</p></div>`).join("");
+  $("prueba-testimonios").innerHTML = T.map(t => `<div class="ventaja"><p style="font-size:16px">“${esc(t.texto)}”</p><h3 style="margin-top:14px;font-size:15px">${esc(t.nombre)}${t.zona ? ` · <span style="font-weight:400">${esc(t.zona)}</span>` : ""}</h3></div>`).join("");
+})();
 /* ===== Medición: una sesión por visitante, enviada al CRM ===== */
 const SID = (() => {
   try{ const s = sessionStorage.getItem("ad_sid"); if(s) return s; }catch(e){}
