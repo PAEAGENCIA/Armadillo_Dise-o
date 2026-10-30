@@ -749,16 +749,17 @@ function turno(){
   return EQUIPO.map(p => [p, datos.leads.filter(x => activo(x) && x.responsable === p).length]).sort((a,b) => a[1] - b[1])[0][0];
 }
 function msjGrupo(l){
+  // Sin emojis: el link de WhatsApp en computadora los convierte en "?". Solo caracteres simples.
   const quien = l.responsable || turno();
-  const ico = { Alta:"🔴", Media:"🟡", Baja:"⚪" }[l.prioridad] || "⚪";
-  const carga = EQUIPO.map(p => `${p === quien ? "👉" : "▫️"} ${p}: ${datos.leads.filter(x => activo(x) && (x.responsable === p || (x === l && p === quien))).length}`).join("\n");
-  return [`🪵 *NUEVO PROSPECTO · ${l.folio}*`, `${ico} Prioridad *${l.prioridad.toLowerCase()}*`, "",
-    `👤 *${l.nombre}*`, `📍 ${l.zona || "Sin zona"}${l.ubic ? " · " + l.ubic : ""}`,
-    `🍳 ${[l.forma, l.acabado].filter(Boolean).join(" · ")}`, `💰 ${l.inversion || "—"} · ⏱️ ${l.tiempo || "—"}`,
-    apartoVisita(l) ? `📅 Apartó visita: ${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""}` : "", "",
-    `✅ *LE TOCA A: ${quien.toUpperCase()}*`, `Escríbele: https://wa.me/52${l.tel}`, "",
-    `📊 *Turnos (leads activos)*`, carga, "",
-    `Responde a este mensaje con:`, `✋ cuando lo tomes · 📞 cuando lo contactes · 📅 cuando quede la visita`].filter((x, i, a) => x !== "" || a[i - 1] !== "").join("\n");
+  const carga = EQUIPO.map(p => `${p === quien ? ">" : " "} ${p.padEnd(10)} ${datos.leads.filter(x => activo(x) && (x.responsable === p || (x === l && p === quien))).length}`).join("\n");
+  return [`*NUEVO PROSPECTO · ${l.folio}*`, `Prioridad *${l.prioridad.toUpperCase()}*`, "",
+    `*${l.nombre}*`, `Zona: ${l.zona || "sin zona"}${l.ubic ? " · " + l.ubic : ""}`,
+    `Cocina: ${[l.forma, l.acabado].filter(Boolean).join(" · ") || "sin dato"}`,
+    `Inversión: ${l.inversion || "sin dato"}`, `Para cuándo: ${l.tiempo || "sin dato"}`,
+    apartoVisita(l) ? `*Apartó visita:* ${l.visitaDia}${l.visitaHora ? ", " + l.visitaHora : ""}` : "", "",
+    `*LE TOCA A: ${quien.toUpperCase()}*`, `Escríbele aquí: https://wa.me/52${l.tel}`, "",
+    "*Turnos (prospectos activos)*", "```" + carga + "```", "",
+    "Respondan a este mensaje con:", "*TOMADO* · *CONTACTADO* · *VISITA AGENDADA*"].filter((x, i, a) => x !== "" || a[i - 1] !== "").join("\n");
 }
 function fichaTexto(l){
   return [`Lead Armadillo · ${l.nombre} (prioridad ${l.prioridad})`, `WhatsApp: ${l.tel}`,
